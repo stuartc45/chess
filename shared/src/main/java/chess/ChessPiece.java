@@ -53,8 +53,12 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        HashSet<ChessMove> moves = new HashSet<ChessMove>();
-        return new HashSet<ChessMove>();
+        HashSet<ChessMove> moves = new HashSet<ChessMove>();
+        ChessPosition start = new ChessPosition(5,4);
+        ChessPosition end = new ChessPosition(6,5);
+        ChessMove move = new ChessMove(start, end, null);
+        moves.add(move);
+        return moves;
     }
 
   @Override

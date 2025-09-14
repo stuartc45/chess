@@ -48,9 +48,9 @@ public class ChessMove {
     @java.lang.Override
     public java.lang.String toString() {
         return "ChessMove{" +
-                "startPosition=" + startPosition +
-                ", endPosition=" + endPosition +
-                ", promotionPiece=" + promotionPiece +
+                "start=" + startPosition +
+                ", end=" + endPosition +
+                ", promotion=" + promotionPiece +
                 '}';
     }
 
