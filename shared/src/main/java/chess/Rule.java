@@ -48,17 +48,17 @@ public class Rule {
       else {
         validMoves.add(new ChessMove(myPosition, end, null));
       }
-    }
-    if (color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) {
-      ChessPosition firstMove = new ChessPosition(end.getRow() -1, start.getColumn());
-      if (board.getPiece(firstMove) == null) {
-        validMoves.add(new ChessMove(myPosition, firstMove, null));
+      if (color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) {
+        ChessPosition firstMove = new ChessPosition(end.getRow() -1, start.getColumn());
+        if (board.getPiece(firstMove) == null) {
+          validMoves.add(new ChessMove(myPosition, firstMove, null));
+        }
       }
-    }
-    if (color == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2) {
-      ChessPosition firstMove = new ChessPosition(end.getRow() +1, start.getColumn());
-      if (board.getPiece(firstMove) == null) {
-        validMoves.add(new ChessMove(myPosition, firstMove, null));
+      if (color == ChessGame.TeamColor.WHITE && myPosition.getRow() == 2) {
+        ChessPosition firstMove = new ChessPosition(end.getRow() +1, start.getColumn());
+        if (board.getPiece(firstMove) == null) {
+          validMoves.add(new ChessMove(myPosition, firstMove, null));
+        }
       }
     }
     ChessPosition leftSide = new ChessPosition(end.getRow(), end.getColumn() - 1);
