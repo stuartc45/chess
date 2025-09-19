@@ -38,11 +38,16 @@ public class Rule {
       direction[0] *= -1;
     }
     ChessPosition end = new ChessPosition(start.getRow() + direction[0], start.getColumn() + direction[1]);
-    if (end.getRow() == 8 || end.getRow() == 1) {
-      // @TODO handle promotions
-    }
     if (board.getPiece(end) == null) {
-      validMoves.add(new ChessMove(myPosition, end, null));
+      if (end.getRow() == 8 || end.getRow() == 1) {
+        validMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.QUEEN));
+        validMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.BISHOP));
+        validMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.KNIGHT));
+        validMoves.add(new ChessMove(myPosition, end, ChessPiece.PieceType.ROOK));
+      }
+      else {
+        validMoves.add(new ChessMove(myPosition, end, null));
+      }
     }
     if (color == ChessGame.TeamColor.BLACK && myPosition.getRow() == 7) {
       ChessPosition firstMove = new ChessPosition(end.getRow() -1, start.getColumn());
@@ -60,12 +65,28 @@ public class Rule {
     ChessPosition rightSide = new ChessPosition(end.getRow(), end.getColumn() + 1);
     if (board.getPiece(leftSide) != null) {
       if (board.getPiece(leftSide).getTeamColor() != color) {
-        validMoves.add(new ChessMove(myPosition, leftSide, null));
+        if (end.getRow() == 8 || end.getRow() == 1) {
+          validMoves.add(new ChessMove(myPosition, leftSide, ChessPiece.PieceType.QUEEN));
+          validMoves.add(new ChessMove(myPosition, leftSide, ChessPiece.PieceType.BISHOP));
+          validMoves.add(new ChessMove(myPosition, leftSide, ChessPiece.PieceType.KNIGHT));
+          validMoves.add(new ChessMove(myPosition, leftSide, ChessPiece.PieceType.ROOK));
+        }
+        else {
+          validMoves.add(new ChessMove(myPosition, leftSide, null));
+        }
       }
     }
     if (board.getPiece(rightSide) != null) {
       if (board.getPiece(rightSide).getTeamColor() != color) {
-        validMoves.add(new ChessMove(myPosition, rightSide, null));
+        if (end.getRow() == 8 || end.getRow() == 1) {
+          validMoves.add(new ChessMove(myPosition, rightSide, ChessPiece.PieceType.QUEEN));
+          validMoves.add(new ChessMove(myPosition, rightSide, ChessPiece.PieceType.BISHOP));
+          validMoves.add(new ChessMove(myPosition, rightSide, ChessPiece.PieceType.KNIGHT));
+          validMoves.add(new ChessMove(myPosition, rightSide, ChessPiece.PieceType.ROOK));
+        }
+        else {
+          validMoves.add(new ChessMove(myPosition, rightSide, null));
+        }
       }
     }
 
