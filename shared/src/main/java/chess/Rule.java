@@ -56,7 +56,18 @@ public class Rule {
         validMoves.add(new ChessMove(myPosition, firstMove, null));
       }
     }
-    
+    ChessPosition leftSide = new ChessPosition(end.getRow(), end.getColumn() - 1);
+    ChessPosition rightSide = new ChessPosition(end.getRow(), end.getColumn() + 1);
+    if (board.getPiece(leftSide) != null) {
+      if (board.getPiece(leftSide).getTeamColor() != color) {
+        validMoves.add(new ChessMove(myPosition, leftSide, null));
+      }
+    }
+    if (board.getPiece(rightSide) != null) {
+      if (board.getPiece(rightSide).getTeamColor() != color) {
+        validMoves.add(new ChessMove(myPosition, rightSide, null));
+      }
+    }
 
 
     // check piece color
