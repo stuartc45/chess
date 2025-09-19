@@ -1,6 +1,5 @@
 package chess;
 
-import java.util.Collection;
 import java.util.*;
 
 /**
@@ -19,47 +18,62 @@ public class ChessPiece {
     this.type = type;
   }
 
-    /**
-     * The various different chess piece options
-     */
-    public enum PieceType {
-        KING,
-        QUEEN,
-        BISHOP,
-        KNIGHT,
-        ROOK,
-        PAWN
-    }
+  /**
+   * The various different chess piece options
+   */
+  public enum PieceType {
+      KING,
+      QUEEN,
+      BISHOP,
+      KNIGHT,
+      ROOK,
+      PAWN
+  }
 
-    /**
-     * @return Which team this chess piece belongs to
-     */
-    public ChessGame.TeamColor getTeamColor() {
-        return pieceColor;
-    }
+  /**
+   * @return Which team this chess piece belongs to
+   */
+  public ChessGame.TeamColor getTeamColor() {
+      return pieceColor;
+  }
 
-    /**
-     * @return which type of chess piece this piece is
-     */
-    public PieceType getPieceType() {
-        return type;
-    }
+  /**
+   * @return which type of chess piece this piece is
+   */
+  public PieceType getPieceType() {
+      return type;
+  }
 
-    /**
-     * Calculates all the positions a chess piece can move to
-     * Does not take into account moves that are illegal due to leaving the king in
-     * danger
-     *
-     * @return Collection of valid moves
-     */
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        HashSet<ChessMove> moves = new HashSet<ChessMove>();
-        ChessPosition start = new ChessPosition(5,4);
-        ChessPosition end = new ChessPosition(6,5);
-        ChessMove move = new ChessMove(start, end, null);
-        moves.add(move);
-        return moves;
-    }
+  /**
+   * Calculates all the positions a chess piece can move to
+   * Does not take into account moves that are illegal due to leaving the king in
+   * danger
+   *
+   * @return Collection of valid moves
+   */
+  public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+
+      Rule rule = switch (getPieceType()) {
+        case KING:
+          new Rule(false, new int[][]{{1,1}, {1,-1}, {-1,-1}, {-1,1}, {1,0}, {-1,0}, {0,1}, {0,-1}});
+        case QUEEN:
+          new Rule(true, new int[][]{{1,1}, {1,-1}, {-1,-1}, {-1,1}, {1,0}, {-1,0}, {0,1}, {0,-1}});
+        case BISHOP:
+          new Rule(true, new int[][]{{1,1}, {1,-1}, {-1,-1}, {-1,1}});
+        case KNIGHT:
+          new Rule(false, new int[][]{{2,1}, {1,2}, {-1,2}, {-2,1}, {-2,-1}, {-1,-2}, {1,-2}, {2,-1}});
+        case ROOK:
+          new Rule(true, new int[][]{{1,0}, {-1,0}, {0,1}, {0,-1}});
+        case PAWN:
+          // @TODO implement something for the pawn
+      };
+      return rule.getMoves(board, myPosition);
+  }
+
+//  public HashSet<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+//    HashSet<ChessMove> moves = new HashSet<ChessMove>();
+//    return moves;
+//  }
 
   @Override
   public String toString() {
