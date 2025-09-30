@@ -61,7 +61,7 @@ public class ChessGame {
         }
         Collection<ChessMove> moves = new HashSet<>();
         for (ChessMove move : piece.pieceMoves(board, startPosition)){
-            if (checkMove(move)) {
+            if (!checkMove(move)) {
                 moves.add(move);
             }
         }
@@ -108,7 +108,31 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        ChessPosition kingPosition = null;
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition spot = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(spot);
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    kingPosition = spot;
+                }
+            }
+        }
 
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition spot = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(spot);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> possibleMoves = piece.pieceMoves(board, spot);
+                    ChessMove move = new ChessMove(spot, kingPosition, null);
+                    if (possibleMoves.contains(move)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
 
 
         // loop through board
