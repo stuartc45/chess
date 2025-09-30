@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -55,7 +56,16 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        return piece != null ? piece.pieceMoves(board, startPosition) : null;
+        if (piece == null) {
+            return null;
+        }
+        Collection<ChessMove> moves = new HashSet<>();
+        for (ChessMove move : piece.pieceMoves(board, startPosition)){
+            if (checkMove(move)) {
+                moves.add(move);
+            }
+        }
+        return moves;
     }
 
     /**
@@ -98,7 +108,15 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+
+
+        // loop through board
+        // get teamcolor king
+        // loop through board
+        // check piecemoves
+        // if king position in piecemoves
+        // return true
     }
 
     /**
@@ -138,5 +156,31 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    private boolean checkMove(ChessMove move) {
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece capturePiece = board.getPiece(end);
+        ChessPiece piece = board.getPiece(start);
+        TeamColor color = piece.getTeamColor();
+        boolean check = false;
+
+        if (capturePiece != null) {
+            board.removePiece(end);
+        }
+        board.addPiece(end, piece);
+        board.removePiece(start);
+
+
+        if (isInCheck(color)) {
+            check = true;
+        }
+        board.addPiece(start, piece);
+        board.removePiece(end);
+        if (capturePiece != null) {
+            board.addPiece(end, capturePiece);
+        }
+        return check;
     }
 }
