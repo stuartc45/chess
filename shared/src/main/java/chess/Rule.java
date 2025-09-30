@@ -93,19 +93,6 @@ public class Rule {
         }
       }
     }
-
-
-
-    // check piece color
-    // do move (forward one square)
-    // check for promotion
-    // check if blocked
-    // if first move
-    //    then check one more square
-    // check diagonal for enemies (don't check out of bounds)
-    // if true
-    //    add move
-    //
   }
 
   public Collection<ChessMove> getMoves(ChessBoard board) {

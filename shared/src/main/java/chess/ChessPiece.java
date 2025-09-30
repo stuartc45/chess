@@ -65,7 +65,6 @@ public class ChessPiece {
         case ROOK -> new Rule(true, myPosition, new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}});
 
         case PAWN -> new Rule(false, myPosition, new int[][]{{1, 0}});
-         // @TODO implement something for the pawn
         default -> null;
       };
       return rule.getMoves(board);
