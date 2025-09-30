@@ -11,12 +11,16 @@ import java.util.Collection;
 public class ChessGame {
     private ChessBoard board;
     private TeamColor teamTurn;
-    
+
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
     }
+
+    // new game - sets up board and sets turn to white
+    //
+
 
     /**
      * @return Which team's turn it is
@@ -50,7 +54,8 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        return piece != null ? piece.pieceMoves(board, startPosition) : null;
     }
 
     /**
@@ -60,7 +65,30 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece capturePiece = board.getPiece(end);
+        ChessPiece piece = board.getPiece(start);
+        TeamColor color = piece.getTeamColor();
+        if (color != getTeamTurn()) {
+            throw new InvalidMoveException();
+        }
+        if (capturePiece != null) {
+            board.removePiece(end);
+        }
+        board.addPiece(end, piece);
+        board.removePiece(start);
+
+
+        if (isInCheck(color)) {
+            board.addPiece(start, piece);
+            board.removePiece(end);
+            if (capturePiece != null) {
+                board.addPiece(end, capturePiece);
+            }
+
+            throw new InvalidMoveException();
+        }
     }
 
     /**
@@ -100,7 +128,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
