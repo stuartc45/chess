@@ -156,18 +156,18 @@ public class ChessGame {
                 }
             }
         }
-        ChessMove move = null;
+        ChessMove promotionMove = null;
         for (int i = 1; i < 9; i++) {
             for (int j = 1; j < 9; j++) {
                 ChessPosition spot = new ChessPosition(i, j);
                 ChessPiece piece = board.getPiece(spot);
                 if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = piece.pieceMoves(board, spot);
-                    if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (spot.getRow() == 1 || spot.getRow() == 8)) {
-                        move = new ChessMove(spot, kingPosition, ChessPiece.PieceType.QUEEN);
+                    if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (kingPosition.getRow() == 1 || kingPosition.getRow() == 8)) {
+                        promotionMove = new ChessMove(spot, kingPosition, ChessPiece.PieceType.QUEEN);
                     }
-                    else {move = new ChessMove(spot, kingPosition, null);}
-                    if (possibleMoves.contains(move)) {
+                    ChessMove move = new ChessMove(spot, kingPosition, null);
+                    if (possibleMoves.contains(move) || possibleMoves.contains(promotionMove)) {
                         return true;
                     }
                 }
