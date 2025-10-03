@@ -183,17 +183,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition spot = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(spot);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> possibleMoves = validMoves(spot);
-                    if (!possibleMoves.isEmpty()) {
-                        return false;
-                    }
-                }
-            }
+        if (!staleOrCheck(teamColor)) {
+            return false;
         }
         return isInCheck(teamColor);
     }
@@ -206,17 +197,8 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        for (int i = 1; i < 9; i++) {
-            for (int j = 1; j < 9; j++) {
-                ChessPosition spot = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(spot);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    Collection<ChessMove> possibleMoves = validMoves(spot);
-                    if (!possibleMoves.isEmpty()) {
-                        return false;
-                    }
-                }
-            }
+        if (!staleOrCheck(teamColor)) {
+            return false;
         }
         return !isInCheck(teamColor);
     }
@@ -263,6 +245,22 @@ public class ChessGame {
             board.addPiece(end, capturePiece);
         }
         return check;
+    }
+
+    private boolean staleOrCheck(TeamColor teamColor) {
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition spot = new ChessPosition(i, j);
+                ChessPiece piece = board.getPiece(spot);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> possibleMoves = validMoves(spot);
+                    if (!possibleMoves.isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     @Override
