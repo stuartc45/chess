@@ -112,13 +112,13 @@ public class ChessGame {
             throw new InvalidMoveException();
         }
         TeamColor color = piece.getTeamColor();
-        Collection<ChessMove> moves = validMoves(start);
         if (color != getTeamTurn()) {
             throw new InvalidMoveException();
         }
+        Collection<ChessMove> moves = validMoves(start);
         if (moves.contains(move)) {
             if (capturePiece != null) {
-            board.removePiece(end);
+                board.removePiece(end);
             }
             if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (end.getRow() == 1 || end.getRow() == 8)) {
                 ChessPiece promotion = new ChessPiece(color, move.getPromotionPiece());
