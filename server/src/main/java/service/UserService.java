@@ -14,6 +14,9 @@ public class UserService {
         if (dataAccess.getUser(user.username()) != null ) {
           throw new Exception("already exists");
         }
+        if (user.username() == null || user.email() == null || user.password() == null) {
+            throw new Exception("bad request");
+        }
         dataAccess.createUser(user);
         return new AuthData(user.username(), generateAuthToken());
     }

@@ -35,7 +35,12 @@ public class Server {
         context.result(serializer.toJson(authData));
         } catch (Exception ex) {
         var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-        context.status(403).result(message);
+        if (ex.getMessage().equals("already exists")) {
+            context.status(403).result(message);
+        }
+        else {
+            context.status(400).result(message);
+        }
         }
 
     }
