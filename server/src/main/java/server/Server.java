@@ -19,24 +19,24 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         server.delete("db", context -> context.result("{}"));
-        server.post("user", context -> register(context));
+        server.post("user", this::register);
 
     }
 
     private void register(Context context) {
-      try {
-//      make sure you change the context type to be a javalin context once javalin is working
         var serializer=new Gson();
+        try {
+
         String reqJson=context.body();
         var user=serializer.fromJson(reqJson, UserData.class);
 
         // call to the service and register
         var authData=userService.register(user);
         context.result(serializer.toJson(authData));
-      } catch (Exception ex) {
-        var message = String.format("{\"message\": \"Error: %s\" })", ex.getMessage());
+        } catch (Exception ex) {
+        var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
         context.status(403).result(message);
-      }
+        }
 
     }
 
