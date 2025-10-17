@@ -21,6 +21,7 @@ public class UserService {
         return new AuthData(user.username(), generateAuthToken());
     }
 
+//    public void login()
 
     // use the script they gave you to generate the authToken
     private String generateAuthToken() {

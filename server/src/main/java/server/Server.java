@@ -20,27 +20,25 @@ public class Server {
         // Register your endpoints and exception handlers here.
         server.delete("db", context -> context.result("{}"));
         server.post("user", this::register);
-
     }
 
     private void register(Context context) {
         var serializer=new Gson();
         try {
+            String reqJson=context.body();
+            var user=serializer.fromJson(reqJson, UserData.class);
 
-        String reqJson=context.body();
-        var user=serializer.fromJson(reqJson, UserData.class);
-
-        // call to the service and register
-        var authData=userService.register(user);
-        context.result(serializer.toJson(authData));
+            // call to the service and register
+            var authData=userService.register(user);
+            context.result(serializer.toJson(authData));
         } catch (Exception ex) {
-        var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-        if (ex.getMessage().equals("already exists")) {
-            context.status(403).result(message);
-        }
-        else {
-            context.status(400).result(message);
-        }
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("already exists")) {
+                context.status(403).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
         }
 
     }
