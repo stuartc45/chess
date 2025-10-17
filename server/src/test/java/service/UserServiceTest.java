@@ -44,4 +44,23 @@ class UserServiceTest {
         assertEquals(user.username(), authData.username());
         assertFalse(authData.authToken().isEmpty());
     }
+
+    @Test
+    void loginInvalidUsername() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        var user = new UserData(null, "j@j.com", "toomanysecrets");
+        db.createUser(user);
+        assertThrows(Exception.class, () -> userService.login(user));
+    }
+
+    @Test
+    void loginInvalidPassword() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var badPassword = new UserData("joe", "j@j.com", "wrongPassword");
+        db.createUser(user);
+        assertThrows(Exception.class, () -> userService.login(badPassword));
+    }
 }
