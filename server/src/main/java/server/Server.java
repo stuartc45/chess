@@ -20,6 +20,7 @@ public class Server {
         // Register your endpoints and exception handlers here.
         server.delete("db", context -> context.result("{}"));
         server.post("user", this::register);
+        server.post("login", this::login);
     }
 
     private void register(Context context) {
@@ -40,7 +41,25 @@ public class Server {
                 context.status(400).result(message);
             }
         }
+    }
 
+    private void login(Context context) {
+        var serializer = new Gson();
+        try {
+            String reqJson = context.body();
+            var user = serializer.fromJson(reqJson, UserData.class);
+
+            var authData = userService.login(user);
+            context.result(serializer.toJson(authData));
+        } catch (Exception ex) {
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("unauthorized")) {
+                context.status(401).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
+        }
     }
 
     public int run(int desiredPort) {
