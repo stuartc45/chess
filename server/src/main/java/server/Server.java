@@ -18,9 +18,10 @@ public class Server {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        server.delete("db", context -> context.result("{}"));
-        server.post("user", this::register);
-        server.post("login", this::login);
+        server.delete("/db", context -> context.result("{}"));
+        server.post("/user", this::register);
+        server.post("/session", this::login);
+        server.delete("/session", this::logout);
     }
 
     private void register(Context context) {
@@ -59,6 +60,18 @@ public class Server {
             else {
                 context.status(400).result(message);
             }
+        }
+    }
+
+    private void logout(Context context) {
+        var serializer = new Gson();
+        try {
+            String reqJson = context.body();
+            var user = serializer.fromJson(reqJson, UserData.class);
+
+            
+        } catch (Exception ex) {
+
         }
     }
 

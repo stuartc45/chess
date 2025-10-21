@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 import datamodel.*;
+import java.util.UUID;
 
 public class UserService {
     private final DataAccess dataAccess;
@@ -22,21 +23,25 @@ public class UserService {
     }
 
     public AuthData login(UserData user) throws Exception {
-        UserData userData = dataAccess.getUser(user.username());
-        if (userData.username() == null) {
-            throw new Exception("unauthorized");
-        }
         if (user.username() == null || user.password() == null) {
             throw new Exception("bad request");
         }
+        if (dataAccess.getUser(user.username()) == null) {
+            throw new Exception("unauthorized");
+        }
+        UserData userData = dataAccess.getUser(user.username());
         if (!user.password().equals(userData.password())) {
             throw new Exception("unauthorized");
         }
         return new AuthData(user.username(), generateAuthToken());
     }
 
+    public void logout(AuthData authData) throws Exception {
+
+    }
+
     // use the script they gave you to generate the authToken
-    private String generateAuthToken() {
-        return "xyz";
+    public static String generateAuthToken() {
+        return UUID.randomUUID().toString();
     }
 }
