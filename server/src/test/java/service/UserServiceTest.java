@@ -67,7 +67,7 @@ class UserServiceTest {
         var user = new UserData("joe", "j@j.com", "toomanysecrets");
         db.createUser(user);
         var authData = userService.login(user);
-        userService.logout(authData);
-        assertThrows(Exception.class, () -> userService.logout(authData));
+        userService.logout(authData.authToken());
+        assertThrows(Exception.class, () -> userService.logout(authData.authToken()));
     }
 }

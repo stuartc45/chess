@@ -40,14 +40,14 @@ public class UserService {
         return authData;
     }
 
-    public void logout(AuthData authData) throws Exception {
-        if (authData.authToken() == null) {
+    public void logout(String authToken) throws Exception {
+        if (authToken == null) {
             throw new Exception("unauthorized");
         }
-        if (dataAccess.getAuth(authData.authToken()) == null) {
+        if (dataAccess.getAuth(authToken) == null) {
             throw new Exception("unauthorized");
         }
-        dataAccess.deleteAuth(authData.authToken());
+        dataAccess.deleteAuth(authToken);
     }
 
     // use the script they gave you to generate the authToken
