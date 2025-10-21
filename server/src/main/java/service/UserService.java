@@ -19,7 +19,9 @@ public class UserService {
             throw new Exception("bad request");
         }
         dataAccess.createUser(user);
-        return new AuthData(user.username(), generateAuthToken());
+        AuthData authData = new AuthData(user.username(), generateAuthToken());
+        dataAccess.addAuth(authData);
+        return authData;
     }
 
     public AuthData login(UserData user) throws Exception {
@@ -33,11 +35,19 @@ public class UserService {
         if (!user.password().equals(userData.password())) {
             throw new Exception("unauthorized");
         }
-        return new AuthData(user.username(), generateAuthToken());
+        AuthData authData = new AuthData(user.username(), generateAuthToken());
+        dataAccess.addAuth(authData);
+        return authData;
     }
 
     public void logout(AuthData authData) throws Exception {
-
+        if (authData.authToken() == null) {
+            throw new Exception("unauthorized");
+        }
+        if (dataAccess.getAuth(authData.authToken()) == null) {
+            throw new Exception("unauthorized");
+        }
+        dataAccess.deleteAuth(authData.authToken());
     }
 
     // use the script they gave you to generate the authToken

@@ -26,11 +26,7 @@ class UserServiceTest {
         DataAccess db = new MemoryDataAccess();
         var user = new UserData(null, "j@j.com", "toomanysecrets");
         var userService = new UserService(db);
-//        var authData = userService.register(user);
         assertThrows(Exception.class, () -> userService.register(user));
-//        assertNotNull(authData);
-//        assertEquals(user.username(), authData.username());
-//        assertFalse(authData.authToken().isEmpty());
     }
 
     @Test
@@ -62,5 +58,16 @@ class UserServiceTest {
         var badPassword = new UserData("joe", "j@j.com", "wrongPassword");
         db.createUser(user);
         assertThrows(Exception.class, () -> userService.login(badPassword));
+    }
+
+    @Test
+    void logout() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        db.createUser(user);
+        var authData = userService.login(user);
+        userService.logout(authData);
+        assertThrows(Exception.class, () -> userService.logout(authData));
     }
 }

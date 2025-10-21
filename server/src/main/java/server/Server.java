@@ -66,12 +66,20 @@ public class Server {
     private void logout(Context context) {
         var serializer = new Gson();
         try {
-            String reqJson = context.body();
-            var user = serializer.fromJson(reqJson, UserData.class);
+            var reqJson = context.header("authorization");
+            var data = serializer.fromJson(reqJson, AuthData.class);
 
-            
+
+            userService.logout(data);
+            context.status(200).result("{}");
         } catch (Exception ex) {
-
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("unauthorized")) {
+                context.status(401).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
         }
     }
 
