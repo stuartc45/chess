@@ -4,6 +4,7 @@ import dataaccess.MemoryDataAccess;
 import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import service.GameService;
 import service.UserService;
 import com.google.gson.Gson;
 
@@ -11,10 +12,12 @@ public class Server {
 
     private final Javalin server;
     private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         var dataAccess = new MemoryDataAccess();
         userService = new UserService(dataAccess);
+        gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
@@ -22,6 +25,9 @@ public class Server {
         server.post("/user", this::register);
         server.post("/session", this::login);
         server.delete("/session", this::logout);
+        server.get("/game", this::listGames);
+        server.post("/game", this::createGame);
+        server.put("/game", this::joinGame);
     }
 
     private void register(Context context) {
@@ -69,6 +75,55 @@ public class Server {
 
             userService.logout(data);
             context.status(200).result("{}");
+        } catch (Exception ex) {
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("unauthorized")) {
+                context.status(401).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
+        }
+    }
+
+    private void listGames(Context context) {
+        try {
+
+        } catch (Exception ex) {
+
+        }
+    }
+
+    private void createGame(Context context) {
+        var serializer = new Gson();
+        try {
+            var header = context.header("authorization");
+            String reqJson = context.body();
+            var data = serializer.fromJson(reqJson, GameData.class);
+
+            int gameID = gameService.createGame(header, data);
+            var returnData = String.format("{\"gameID\": %d }", gameID);
+            context.result(returnData);
+        } catch (Exception ex) {
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("unauthorized")) {
+                context.status(401).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
+        }
+    }
+
+    private void joinGame(Context context) {
+        var serializer = new Gson();
+        try {
+            var header = context.header("authorization");
+            String reqJson = context.body();
+            var data = serializer.fromJson(reqJson, JoinGameData.class);
+
+            gameService.joinGame(header, data);
+            context.result("{}");
         } catch (Exception ex) {
             var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
             if (ex.getMessage().equals("unauthorized")) {

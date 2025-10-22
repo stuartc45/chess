@@ -9,4 +9,7 @@ public interface DataAccess {
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
     void addAuth(AuthData authData);
+    void createGame(GameData gameData);
+    GameData getGame(Integer gameID);
+    void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName);
 }
