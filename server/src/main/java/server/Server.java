@@ -83,13 +83,7 @@ public class Server {
             userService.logout(data);
             context.status(200).result("{}");
         } catch (Exception ex) {
-            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-            if (ex.getMessage().equals("unauthorized")) {
-                context.status(401).result(message);
-            }
-            else {
-                context.status(400).result(message);
-            }
+            catchException(ex, context);
         }
     }
 
@@ -102,13 +96,7 @@ public class Server {
             var returnData = String.format("{ \"games\": %s }", serializer.toJson(gameList));
             context.result(returnData);
         } catch (Exception ex) {
-            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-            if (ex.getMessage().equals("unauthorized")) {
-                context.status(401).result(message);
-            }
-            else {
-                context.status(400).result(message);
-            }
+            catchException(ex, context);
         }
     }
 
@@ -123,13 +111,7 @@ public class Server {
             var returnData = String.format("{\"gameID\": %d }", gameID);
             context.result(returnData);
         } catch (Exception ex) {
-            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-            if (ex.getMessage().equals("unauthorized")) {
-                context.status(401).result(message);
-            }
-            else {
-                context.status(400).result(message);
-            }
+            catchException(ex, context);
         }
     }
 
@@ -153,6 +135,16 @@ public class Server {
             else {
                 context.status(400).result(message);
             }
+        }
+    }
+
+    private void catchException(Exception ex, Context context) {
+        var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+        if (ex.getMessage().equals("unauthorized")) {
+            context.status(401).result(message);
+        }
+        else {
+            context.status(400).result(message);
         }
     }
 
