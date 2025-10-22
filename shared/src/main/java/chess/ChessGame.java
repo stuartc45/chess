@@ -73,37 +73,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        ChessPosition start = move.getStartPosition();
-//        ChessPosition end = move.getEndPosition();
-//        ChessPiece capturePiece = board.getPiece(end);
-//        ChessPiece piece = board.getPiece(start);
-//        TeamColor color = piece.getTeamColor();
-//        if (color != getTeamTurn()) {
-//            throw new InvalidMoveException();
-//        }
-//        if (capturePiece != null) {
-//            board.removePiece(end);
-//        }
-//        board.addPiece(end, piece);
-//        board.removePiece(start);
-//
-//
-//        if (isInCheck(color)) {
-//            board.addPiece(start, piece);
-//            board.removePiece(end);
-//            if (capturePiece != null) {
-//                board.addPiece(end, capturePiece);
-//            }
-//
-//            throw new InvalidMoveException();
-//        }
-
-
-
-
-
-
-
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
         ChessPiece capturePiece = board.getPiece(end);
@@ -265,7 +234,9 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         ChessGame chessGame=(ChessGame) o;
         return Objects.equals(board, chessGame.board) && teamTurn == chessGame.teamTurn;
     }

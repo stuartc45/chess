@@ -34,10 +34,6 @@ public class ChessPosition {
       return col;
   }
 
-//  public void addToCol(int num) {
-//    col = col + num;
-//  }
-
   @Override
   public String toString() {
     return  "{row=" + row +
@@ -47,7 +43,9 @@ public class ChessPosition {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+        return false;
+    }
     ChessPosition that=(ChessPosition) o;
     return row == that.row && col == that.col;
   }

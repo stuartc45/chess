@@ -70,11 +70,6 @@ public class ChessPiece {
       return rule.getMoves(board);
   }
 
-//  public HashSet<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-//    HashSet<ChessMove> moves = new HashSet<ChessMove>();
-//    return moves;
-//  }
-
   @Override
   public String toString() {
     return "ChessPiece{" +
@@ -85,7 +80,9 @@ public class ChessPiece {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || getClass() != o.getClass()) return false;
+    if (o == null || getClass() != o.getClass()) {
+        return false;
+    }
     ChessPiece that=(ChessPiece) o;
     return pieceColor == that.pieceColor && type == that.type;
   }
