@@ -46,4 +46,50 @@ class GameServiceTest {
         var game = db.getGame(gameID);
         assertNotNull(game.whiteUsername());
     }
+
+    @Test
+    void joinGameWhereColorNotNormal() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var gameService = new GameService(db);
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        db.createUser(user);
+        var authData = userService.login(user);
+        var gameData = new GameData(null, "bill", null, "newGame", null);
+        var gameID = gameService.createGame(authData.authToken(), gameData);
+        assertThrows(Exception.class, () -> gameService.joinGame(authData.authToken(), new JoinGameData("green", gameID)));
+    }
+
+    @Test
+    void listGamesTest() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var gameService = new GameService(db);
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        db.createUser(user);
+        var authData = userService.login(user);
+        var gameData = new GameData(null, "bill", null, "newGame", null);
+        var gameID = gameService.createGame(authData.authToken(), gameData);
+        gameService.joinGame(authData.authToken(), new JoinGameData("white", gameID));
+        var otherGame = new GameData(null, null, null, "otherGame", null);
+        var otherGameID = gameService.createGame(authData.authToken(), otherGame);
+        assertNotNull(gameService.listGames(authData.authToken()));
+    }
+
+    @Test
+    void listGamesUnauthorized() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var gameService = new GameService(db);
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        db.createUser(user);
+        var authData = userService.login(user);
+        var gameData = new GameData(null, "bill", null, "newGame", null);
+        var gameID = gameService.createGame(authData.authToken(), gameData);
+        gameService.joinGame(authData.authToken(), new JoinGameData("white", gameID));
+        var otherGame = new GameData(null, null, null, "otherGame", null);
+        var otherGameID = gameService.createGame(authData.authToken(), otherGame);
+        userService.logout(authData.authToken());
+        assertThrows(Exception.class, () -> gameService.listGames(authData.authToken()));
+    }
 }

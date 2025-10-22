@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import datamodel.GameData;
 import datamodel.UserData;
 import org.eclipse.jetty.server.Authentication;
 import org.junit.jupiter.api.Test;
@@ -80,5 +81,20 @@ class UserServiceTest {
         var authData = userService.login(user);
         userService.logout(authData.authToken());
         assertThrows(Exception.class, () -> userService.logout(authData.authToken()));
+    }
+
+    @Test
+    void clear() throws Exception {
+        DataAccess db = new MemoryDataAccess();
+        var userService = new UserService(db);
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var otherUser = new UserData("Jane", "jan@j.com", "notenoughsecrets");
+        db.createUser(user);
+        db.createUser(otherUser);
+        var authData = userService.login(user);
+        var otherData = userService.login(otherUser);
+        userService.clear();
+        assertNull(db.getUser("joe"));
+        assertNull(db.getAuth(otherData.authToken()));
     }
 }
