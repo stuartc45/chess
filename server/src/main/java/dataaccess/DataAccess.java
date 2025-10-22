@@ -1,6 +1,7 @@
 package dataaccess;
 
 import datamodel.*;
+import java.util.*;
 
 public interface DataAccess {
     void clear();
@@ -12,4 +13,5 @@ public interface DataAccess {
     void createGame(GameData gameData);
     GameData getGame(Integer gameID);
     void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName);
+    List<GameData> getGameList();
 }

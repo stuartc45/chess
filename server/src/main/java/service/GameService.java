@@ -62,4 +62,11 @@ public class GameService {
             throw new Exception("bad request");
         }
     }
+
+    public List<GameData> listGames(String authToken) throws Exception {
+        if (dataAccess.getAuth(authToken) == null) {
+            throw new Exception("unauthorized");
+        }
+        return dataAccess.getGameList();
+    }
 }

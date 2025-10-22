@@ -8,6 +8,8 @@ import service.GameService;
 import service.UserService;
 import com.google.gson.Gson;
 
+import java.util.*;
+
 public class Server {
 
     private final Javalin server;
@@ -88,9 +90,20 @@ public class Server {
 
     private void listGames(Context context) {
         try {
+            var serializer = new Gson();
+            var data = context.header("authorization");
 
+            List<GameData> gameList = gameService.listGames(data);
+            var returnData = String.format("{ \"games\": %s }", serializer.toJson(gameList));
+            context.result(returnData);
         } catch (Exception ex) {
-
+            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
+            if (ex.getMessage().equals("unauthorized")) {
+                context.status(401).result(message);
+            }
+            else {
+                context.status(400).result(message);
+            }
         }
     }
 

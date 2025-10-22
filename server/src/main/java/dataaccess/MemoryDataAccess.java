@@ -4,7 +4,7 @@ import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.UserData;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class MemoryDataAccess implements DataAccess {
     private final HashMap<String, UserData> users = new HashMap<>();
@@ -13,6 +13,8 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void clear() {
         users.clear();
+        auth.clear();
+        games.clear();
     }
 
     @Override
@@ -53,5 +55,10 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName) {
         games.put(gameID, new GameData(gameID, whiteUsername, blackUsername, gameName, null));
+    }
+
+    @Override
+    public List<GameData> getGameList() {
+        return new ArrayList<>(games.values());
     }
 }
