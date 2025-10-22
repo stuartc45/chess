@@ -64,11 +64,8 @@ public class Server {
     }
 
     private void logout(Context context) {
-        var serializer = new Gson();
         try {
             var data = context.header("authorization");
-//            var data = serializer.fromJson(reqJson, AuthData.class);
-
 
             userService.logout(data);
             context.status(200).result("{}");
