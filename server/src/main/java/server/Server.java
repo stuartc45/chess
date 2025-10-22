@@ -66,13 +66,7 @@ public class Server {
             var authData = userService.login(user);
             context.result(serializer.toJson(authData));
         } catch (Exception ex) {
-            var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-            if (ex.getMessage().equals("unauthorized")) {
-                context.status(401).result(message);
-            }
-            else {
-                context.status(400).result(message);
-            }
+            catchException(ex, context);
         }
     }
 
