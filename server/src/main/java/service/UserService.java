@@ -11,9 +11,13 @@ public class UserService {
         this.dataAccess=dataAccess;
     }
 
+    public void clear() {
+        dataAccess.clear();
+    }
+
     public AuthData register(UserData user) throws Exception {
         if (dataAccess.getUser(user.username()) != null ) {
-          throw new Exception("already exists");
+          throw new Exception("already taken");
         }
         if (user.username() == null || user.email() == null || user.password() == null) {
             throw new Exception("bad request");

@@ -23,13 +23,18 @@ public class Server {
         server = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        server.delete("/db", context -> context.result("{}"));
+        server.delete("/db", this::clear);
         server.post("/user", this::register);
         server.post("/session", this::login);
         server.delete("/session", this::logout);
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
+    }
+
+    private void clear(Context context) {
+        userService.clear();
+        context.result("{}");
     }
 
     private void register(Context context) {
@@ -43,7 +48,7 @@ public class Server {
             context.result(serializer.toJson(authData));
         } catch (Exception ex) {
             var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
-            if (ex.getMessage().equals("already exists")) {
+            if (ex.getMessage().equals("already taken")) {
                 context.status(403).result(message);
             }
             else {
@@ -141,6 +146,9 @@ public class Server {
             var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
             if (ex.getMessage().equals("unauthorized")) {
                 context.status(401).result(message);
+            }
+            else if (ex.getMessage().equals("already taken")) {
+                context.status(403).result(message);
             }
             else {
                 context.status(400).result(message);
