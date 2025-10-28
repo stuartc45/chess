@@ -1,6 +1,6 @@
 package server;
 
-import dataaccess.MemoryDataAccess;
+import dataaccess.*;
 import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
@@ -16,8 +16,8 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
 
-    public Server() {
-        var dataAccess = new MemoryDataAccess();
+    public Server() throws DataAccessException {
+        var dataAccess = new SqlDataAccess();
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
