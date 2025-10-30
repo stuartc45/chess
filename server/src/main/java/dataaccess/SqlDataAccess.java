@@ -1,12 +1,15 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.UserData;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
+
+import static java.sql.Types.NULL;
 
 public class SqlDataAccess implements DataAccess {
     public SqlDataAccess() throws DataAccessException {
@@ -31,7 +34,11 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void createUser(UserData user) {
+    public void createUser(UserData user) throws DataAccessException {
+
+            var statement = "INSERT INTO user_data (username, password, email) VALUES (?, ?, ?)";
+            String json = new Gson().toJson(user);
+
 
     }
 
@@ -73,6 +80,30 @@ public class SqlDataAccess implements DataAccess {
     @Override
     public List<GameData> getGameList() {
         return List.of();
+    }
+
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            try (PreparedStatement str = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
+                for (int i = 0; i < params.length; i++) {
+                    Object param = params[i];
+                    if (param instanceof String s) str.setString(i + 1, s);
+                    else if (param instanceof ChessGame s) str.setString(i + 1, new Gson().toJson(s));
+                    else if (param instanceof Integer s) str.setInt(i + 1, s);
+                    else if (param == null) str.setNull(i + 1, NULL);
+                }
+                str.executeUpdate();
+
+                ResultSet rs = str.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+
+                return 0;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("failed");
+        }
     }
 
     private final String[] createStatements = {

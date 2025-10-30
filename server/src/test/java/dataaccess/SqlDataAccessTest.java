@@ -9,7 +9,7 @@ class SqlDataAccessTest {
     @Test
     void clear() throws DataAccessException {
         var dataAccess = new SqlDataAccess();
-        dataAccess.
+
     }
 
     @Test

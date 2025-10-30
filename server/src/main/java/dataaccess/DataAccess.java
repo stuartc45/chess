@@ -1,11 +1,13 @@
 package dataaccess;
 
 import datamodel.*;
+
+import java.sql.SQLException;
 import java.util.*;
 
 public interface DataAccess {
     void clear() throws DataAccessException;
-    void createUser(UserData user);
+    void createUser(UserData user) throws DataAccessException, SQLException;
     UserData getUser(String username);
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
