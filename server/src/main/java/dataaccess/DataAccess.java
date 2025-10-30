@@ -4,7 +4,7 @@ import datamodel.*;
 import java.util.*;
 
 public interface DataAccess {
-    void clear();
+    void clear() throws DataAccessException;
     void createUser(UserData user);
     UserData getUser(String username);
     AuthData getAuth(String authToken);

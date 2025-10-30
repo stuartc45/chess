@@ -14,8 +14,20 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void clear() {
-
+    public void clear() throws DataAccessException {
+        var statements = new String[] {
+                "DELETE FROM auth_data",
+                "DELETE FROM user_data",
+                "DELETE FROM game_data"
+        };
+        try (Connection conn = DatabaseManager.getConnection()) {
+            for (String str : statements)
+                try (var preparedStatement = conn.prepareStatement(str)) {
+                    preparedStatement.executeUpdate();
+                }
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("failed");
+        }
     }
 
     @Override

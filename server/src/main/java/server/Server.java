@@ -32,7 +32,7 @@ public class Server {
         server.put("/game", this::joinGame);
     }
 
-    private void clear(Context context) {
+    private void clear(Context context) throws DataAccessException {
         userService.clear();
         context.result("{}");
     }

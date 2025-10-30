@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import datamodel.*;
 import java.util.UUID;
 
@@ -11,7 +12,7 @@ public class UserService {
         this.dataAccess=dataAccess;
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         dataAccess.clear();
     }
 
