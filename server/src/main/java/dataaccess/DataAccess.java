@@ -8,10 +8,10 @@ import java.util.*;
 public interface DataAccess {
     void clear() throws DataAccessException;
     void createUser(UserData user) throws DataAccessException, SQLException;
-    UserData getUser(String username);
+    UserData getUser(String username) throws DataAccessException;
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
-    void addAuth(AuthData authData);
+    void addAuth(AuthData authData) throws DataAccessException;
     void createGame(GameData gameData);
     GameData getGame(Integer gameID);
     void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName);

@@ -40,7 +40,9 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws DataAccessException {
+//        var statement = "SELECT * FROM user_data WHERE username = ?";
+//        executeUpdate(statement, username);
         return null;
     }
 
@@ -55,8 +57,9 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void addAuth(AuthData authData) {
-
+    public void addAuth(AuthData authData) throws DataAccessException {
+        var statement = "INSERT INTO auth_data (username, authToken) VALUES (?, ?)";
+        executeUpdate(statement, authData.username(), authData.authToken());
     }
 
     @Override

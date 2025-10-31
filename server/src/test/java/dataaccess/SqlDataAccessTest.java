@@ -1,6 +1,6 @@
 package dataaccess;
 
-import datamodel.UserData;
+import datamodel.*;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
@@ -36,7 +36,10 @@ class SqlDataAccessTest {
     }
 
     @Test
-    void addAuth() {
+    void addAuth() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
     }
 
     @Test
