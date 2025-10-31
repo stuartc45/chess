@@ -35,11 +35,8 @@ public class SqlDataAccess implements DataAccess {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-
-            var statement = "INSERT INTO user_data (username, password, email) VALUES (?, ?, ?)";
-            String json = new Gson().toJson(user);
-
-
+        var statement = "INSERT INTO user_data (username, password, email) VALUES (?, ?, ?)";
+        executeUpdate(statement, user.username(), user.password(), user.email());
     }
 
     @Override
@@ -108,7 +105,7 @@ public class SqlDataAccess implements DataAccess {
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS UserData (
+            CREATE TABLE IF NOT EXISTS user_data (
                 `username` VARCHAR(255) NOT NULL,
                 `password` VARCHAR(255) NOT NULL,
                 `email` VARCHAR(255) NOT NULL UNIQUE,
@@ -116,14 +113,14 @@ public class SqlDataAccess implements DataAccess {
             );
             """,
             """
-            CREATE TABLE IF NOT EXISTS AuthData (
+            CREATE TABLE IF NOT EXISTS auth_data (
                 `username` VARCHAR(255) NOT NULL,
                 `authToken` VARCHAR(255) NOT NULL,
                 PRIMARY KEY (`authToken`)
             );
             """,
             """
-            CREATE TABLE IF NOT EXISTS GameData (
+            CREATE TABLE IF NOT EXISTS game_data (
                 `gameID` INT NOT NULL AUTO_INCREMENT,
                 `whiteUsername` VARCHAR(255),
                 `blackUsername` VARCHAR(255),
