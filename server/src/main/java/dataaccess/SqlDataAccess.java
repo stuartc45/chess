@@ -78,8 +78,9 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void deleteAuth(String authToken) {
-
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auth_data WHERE authToken = ?";
+        executeUpdate(statement, authToken);
     }
 
     @Override

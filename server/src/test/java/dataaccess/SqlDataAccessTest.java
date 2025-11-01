@@ -40,7 +40,12 @@ class SqlDataAccessTest {
     }
 
     @Test
-    void deleteAuth() {
+    void deleteAuth() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
+        db.deleteAuth(authData.authToken());
+        assertNull(db.getAuth(authData.authToken()));
     }
 
     @Test
