@@ -8,7 +8,7 @@ import java.util.*;
 public interface DataAccess {
     void clear() throws DataAccessException;
     void createUser(UserData user) throws DataAccessException, SQLException;
-    UserData getUser(String username) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException, SQLException;
     AuthData getAuth(String authToken);
     void deleteAuth(String authToken);
     void addAuth(AuthData authData) throws DataAccessException;
