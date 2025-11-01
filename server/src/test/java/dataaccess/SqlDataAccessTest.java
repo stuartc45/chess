@@ -26,7 +26,7 @@ class SqlDataAccessTest {
     @Test
     void createUser() throws SQLException, DataAccessException {
         DataAccess db = new SqlDataAccess();
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var user = new UserData("joe", "toomanysecrets", "j@j.com");
         db.createUser(user);
         assertEquals(user, db.getUser(user.username()));
     }
