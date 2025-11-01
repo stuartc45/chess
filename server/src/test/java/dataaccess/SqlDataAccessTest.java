@@ -59,8 +59,9 @@ class SqlDataAccessTest {
     @Test
     void createGame() throws DataAccessException {
         DataAccess db = new SqlDataAccess();
-        var gameData = new GameData(null, null, null, "game", new ChessGame());
+        var gameData = new GameData(1, null, null, "game", new ChessGame());
         db.createGame(gameData);
+        assertEquals(gameData, db.getGame(1));
     }
 
     @Test

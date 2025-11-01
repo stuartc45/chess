@@ -49,7 +49,7 @@ public class SqlDataAccess implements DataAccess {
                 UserData user = null;
                 if (rs.next()) {
                     user = new UserData(rs.getString(1), rs.getString(2), rs.getString(3));
-                };
+                }
                 return user;
             }
         }
@@ -68,7 +68,7 @@ public class SqlDataAccess implements DataAccess {
                 AuthData auth = null;
                 if (rs.next()) {
                     auth = new AuthData(rs.getString(1), rs.getString(2));
-                };
+                }
                 return auth;
             }
         }
@@ -96,8 +96,22 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public GameData getGame(Integer gameID) {
-        return null;
+    public GameData getGame(Integer gameID) throws DataAccessException {
+        var statement = "SELECT * FROM game_data WHERE gameID = ?";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
+                var rs = preparedStatement.executeQuery();
+                GameData gameData = null;
+                if (rs.next()) {
+                    gameData = new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
+                }
+                return gameData;
+            }
+        }
+        catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("failed");
+        }
     }
 
     @Override
