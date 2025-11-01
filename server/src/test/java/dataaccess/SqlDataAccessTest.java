@@ -12,9 +12,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class SqlDataAccessTest {
 
     @Test
-    void clear() throws DataAccessException {
-        var dataAccess = new SqlDataAccess();
-
+    void clear() throws DataAccessException, SQLException {
+        DataAccess db = new SqlDataAccess();
+        var user = new UserData("joe", "j@j.com", "toomanysecrets");
+        var authData = new AuthData("joe", "xyz");
+        db.createUser(user);
+        db.addAuth(authData);
+        db.clear();
+        assertNull(db.getAuth(authData.authToken()));
+        assertNull(db.getUser(user.username()));
     }
 
     @Test
