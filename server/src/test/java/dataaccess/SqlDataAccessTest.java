@@ -1,7 +1,9 @@
 package dataaccess;
 
+import chess.ChessGame;
 import datamodel.*;
 import org.junit.jupiter.api.Test;
+import service.GameService;
 
 import java.sql.SQLException;
 
@@ -43,7 +45,10 @@ class SqlDataAccessTest {
     }
 
     @Test
-    void createGame() {
+    void createGame() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var gameData = new GameData(null, null, null, "game", new ChessGame());
+        db.createGame(gameData);
     }
 
     @Test

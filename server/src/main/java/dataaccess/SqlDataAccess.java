@@ -75,8 +75,9 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void createGame(GameData gameData) {
-
+    public void createGame(GameData gameData) throws DataAccessException {
+        var statement = "INSERT INTO game_data (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+        executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game());
     }
 
     @Override
