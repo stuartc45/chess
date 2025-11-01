@@ -42,6 +42,7 @@ class SqlDataAccessTest {
         DataAccess db = new SqlDataAccess();
         var authData = new AuthData("joe", "xyz");
         db.addAuth(authData);
+        assertEquals(authData, db.getAuth(authData.authToken()));
     }
 
     @Test
