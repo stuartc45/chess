@@ -1,19 +1,25 @@
 package service;
 
 import dataaccess.DataAccess;
+import dataaccess.DataAccessException;
 import dataaccess.MemoryDataAccess;
+import dataaccess.SqlDataAccess;
 import datamodel.GameData;
 import datamodel.UserData;
 import org.eclipse.jetty.server.Authentication;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
+    @BeforeEach
+
+
     @Test
     void register() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         var userService = new UserService(db);
         var authData = userService.register(user);
@@ -23,8 +29,8 @@ class UserServiceTest {
     }
 
     @Test
-    void registerInvalidUsername() {
-        DataAccess db = new MemoryDataAccess();
+    void registerInvalidUsername() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
         var user = new UserData(null, "toomanysecrets", "j@j.com");
         var userService = new UserService(db);
         assertThrows(Exception.class, () -> userService.register(user));
@@ -32,7 +38,7 @@ class UserServiceTest {
 
     @Test
     void login() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         db.createUser(user);
@@ -44,7 +50,7 @@ class UserServiceTest {
 
     @Test
     void loginInvalidUsername() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData(null, "toomanysecrets", "j@j.com");
         db.createUser(user);
@@ -53,7 +59,7 @@ class UserServiceTest {
 
     @Test
     void loginInvalidPassword() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         var badPassword = new UserData("joe", "wrongPassword", "j@j.com");
@@ -63,7 +69,7 @@ class UserServiceTest {
 
     @Test
     void logout() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         db.createUser(user);
@@ -74,7 +80,7 @@ class UserServiceTest {
 
     @Test
     void doubleLogout() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         db.createUser(user);
@@ -85,7 +91,7 @@ class UserServiceTest {
 
     @Test
     void clear() throws Exception {
-        DataAccess db = new MemoryDataAccess();
+        DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         var otherUser = new UserData("Jane", "notenoughsecrets", "jan@j.com");

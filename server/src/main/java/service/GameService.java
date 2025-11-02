@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.DataAccess;
 import datamodel.GameData;
 import datamodel.*;
@@ -22,17 +23,18 @@ public class GameService {
             throw new Exception("bad request");
         }
 
-        int num = 1;
-        while (true) {
-            if (!gameIDs.contains(num)) {
-                gameIDs.add(num);
-                GameData game = new GameData(num, null, null, gameData.gameName(), null);
-                dataAccess.createGame(game);
-                break;
-            }
-            num++;
-        }
-        return num;
+        GameData tempGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), new ChessGame());
+        return dataAccess.createGame(tempGame);
+//        int num = 1;
+//        while (true) {
+//            if (!gameIDs.contains(num)) {
+//                gameIDs.add(num);
+//                GameData game = new GameData(num, null, null, gameData.gameName(), null);
+//                dataAccess.createGame(game);
+//                break;
+//            }
+//            num++;
+//        }
     }
 
     public void joinGame(String authToken, JoinGameData joinData) throws Exception {

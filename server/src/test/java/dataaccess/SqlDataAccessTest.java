@@ -77,7 +77,7 @@ class SqlDataAccessTest {
         db.createGame(gameData);
         db.updateGame(1, "player1", null, "game");
         var game = db.getGame(1);
-        assertEquals(game.whiteUsername(), "player1");
+        assertEquals("player1", game.whiteUsername());
         assertEquals(game.blackUsername(), gameData.blackUsername());
     }
 
@@ -98,6 +98,6 @@ class SqlDataAccessTest {
         listOfGames.add(gameData2);
         listOfGames.add(gameData3);
         var gameList = db.getGameList();
-        assertEquals(gameList, listOfGames);
+        assertEquals(listOfGames, gameList);
     }
 }

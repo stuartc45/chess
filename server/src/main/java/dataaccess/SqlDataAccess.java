@@ -91,9 +91,9 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void createGame(GameData gameData) throws DataAccessException {
+    public int createGame(GameData gameData) throws DataAccessException {
         var statement = "INSERT INTO game_data (whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
-        executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game());
+        return executeUpdate(statement, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), gameData.game());
     }
 
     @Override
@@ -142,10 +142,14 @@ public class SqlDataAccess implements DataAccess {
             try (PreparedStatement str = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    if (param instanceof String s) str.setString(i + 1, s);
-                    else if (param instanceof ChessGame s) str.setString(i + 1, new Gson().toJson(s));
-                    else if (param instanceof Integer s) str.setInt(i + 1, s);
-                    else if (param == null) str.setNull(i + 1, NULL);
+                    switch (param) {
+                        case String s -> str.setString(i + 1, s);
+                        case ChessGame s -> str.setString(i + 1, new Gson().toJson(s));
+                        case Integer s -> str.setInt(i + 1, s);
+                        case null -> str.setNull(i + 1, NULL);
+                        default -> {
+                        }
+                    }
                 }
                 str.executeUpdate();
 

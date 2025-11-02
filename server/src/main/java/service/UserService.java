@@ -3,6 +3,8 @@ package service;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import datamodel.*;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.UUID;
 
 public class UserService {
@@ -23,7 +25,9 @@ public class UserService {
         if (user.username() == null || user.email() == null || user.password() == null) {
             throw new Exception("bad request");
         }
-        dataAccess.createUser(user);
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        UserData tempUser = new UserData(user.username(), hashedPassword, user.email());
+        dataAccess.createUser(tempUser);
         AuthData authData = new AuthData(user.username(), generateAuthToken());
         dataAccess.addAuth(authData);
         return authData;
@@ -37,7 +41,7 @@ public class UserService {
             throw new Exception("unauthorized");
         }
         UserData userData = dataAccess.getUser(user.username());
-        if (!user.password().equals(userData.password())) {
+        if (!BCrypt.checkpw(user.password(), userData.password())) {
             throw new Exception("unauthorized");
         }
         AuthData authData = new AuthData(user.username(), generateAuthToken());
