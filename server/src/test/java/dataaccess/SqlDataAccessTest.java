@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import datamodel.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.GameService;
 
@@ -12,6 +13,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlDataAccessTest {
+
+    @BeforeEach
+    public void clearDB() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        db.clear();
+    }
 
     @Test
     void clear() throws DataAccessException, SQLException {
@@ -31,6 +38,13 @@ class SqlDataAccessTest {
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         db.createUser(user);
         assertEquals(user, db.getUser(user.username()));
+    }
+
+    @Test
+    void createBadUser() throws SQLException, DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var user = new UserData(null, "toomanysecrets", "j@j.com");
+        assertThrows(Exception.class, () -> db.createUser(user));
     }
 
     @Test

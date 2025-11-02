@@ -15,7 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceTest {
 
     @BeforeEach
-
+    public void clearDB() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        db.clear();
+    }
 
     @Test
     void register() throws Exception {
@@ -41,7 +44,7 @@ class UserServiceTest {
         DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
-        db.createUser(user);
+        userService.register(user);
         var authData = userService.login(user);
         assertNotNull(authData);
         assertEquals(user.username(), authData.username());
@@ -52,9 +55,7 @@ class UserServiceTest {
     void loginInvalidUsername() throws Exception {
         DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
-        var user = new UserData(null, "toomanysecrets", "j@j.com");
-        db.createUser(user);
-        assertThrows(Exception.class, () -> userService.login(user));
+        assertThrows(Exception.class, () -> userService.login(new UserData(null, "toomanysecrets", "j@j.com")));
     }
 
     @Test
@@ -72,7 +73,7 @@ class UserServiceTest {
         DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
-        db.createUser(user);
+        userService.register(user);
         var authData = userService.login(user);
         userService.logout(authData.authToken());
         assertNull(db.getAuth(authData.authToken()));
@@ -83,7 +84,7 @@ class UserServiceTest {
         DataAccess db = new SqlDataAccess();
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
-        db.createUser(user);
+        userService.register(user);
         var authData = userService.login(user);
         userService.logout(authData.authToken());
         assertThrows(Exception.class, () -> userService.logout(authData.authToken()));
@@ -95,8 +96,8 @@ class UserServiceTest {
         var userService = new UserService(db);
         var user = new UserData("joe", "toomanysecrets", "j@j.com");
         var otherUser = new UserData("Jane", "notenoughsecrets", "jan@j.com");
-        db.createUser(user);
-        db.createUser(otherUser);
+        userService.register(user);
+        userService.register(otherUser);
         var authData = userService.login(user);
         var otherData = userService.login(otherUser);
         userService.clear();
