@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import service.GameService;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,10 +71,33 @@ class SqlDataAccessTest {
     }
 
     @Test
-    void updateGame() {
+    void updateGame() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var gameData = new GameData(1, null, null, "game", new ChessGame());
+        db.createGame(gameData);
+        db.updateGame(1, "player1", null, "game");
+        var game = db.getGame(1);
+        assertEquals(game.whiteUsername(), "player1");
+        assertEquals(game.blackUsername(), gameData.blackUsername());
     }
 
     @Test
-    void getGameList() {
+    void getGameList() throws DataAccessException, SQLException {
+        DataAccess db = new SqlDataAccess();
+        var gameData = new GameData(1, null, null, "game", new ChessGame());
+        db.createGame(gameData);
+        var gameData1 = new GameData(2, null, null, "game2", new ChessGame());
+        db.createGame(gameData1);
+        var gameData2 = new GameData(3, null, null, "game3", new ChessGame());
+        db.createGame(gameData2);
+        var gameData3 = new GameData(4, null, null, "game4", new ChessGame());
+        db.createGame(gameData3);
+        List<GameData> listOfGames = new ArrayList<>();
+        listOfGames.add(gameData);
+        listOfGames.add(gameData1);
+        listOfGames.add(gameData2);
+        listOfGames.add(gameData3);
+        var gameList = db.getGameList();
+        assertEquals(gameList, listOfGames);
     }
 }

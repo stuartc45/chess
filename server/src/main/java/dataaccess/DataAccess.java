@@ -14,6 +14,6 @@ public interface DataAccess {
     void addAuth(AuthData authData) throws DataAccessException;
     void createGame(GameData gameData) throws DataAccessException;
     GameData getGame(Integer gameID) throws DataAccessException;
-    void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName);
-    List<GameData> getGameList();
+    void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName) throws DataAccessException;
+    List<GameData> getGameList() throws DataAccessException, SQLException;
 }

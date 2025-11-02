@@ -7,6 +7,7 @@ import datamodel.GameData;
 import datamodel.UserData;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.sql.Types.NULL;
@@ -115,13 +116,25 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
-    public void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName) {
-
+    public void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName) throws DataAccessException {
+        var statement = "UPDATE game_data SET whiteUsername = ?, blackUsername = ?, gameName = ? WHERE gameID = ?;";
+        executeUpdate(statement, whiteUsername, blackUsername, gameName, gameID);
     }
 
     @Override
-    public List<GameData> getGameList() {
-        return List.of();
+    public List<GameData> getGameList() throws DataAccessException, SQLException {
+        var statement = "SELECT * FROM game_data;";
+        List<GameData> gameList = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                var rs = preparedStatement.executeQuery();
+                while (rs.next()) {
+                    GameData game = new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
+                    gameList.add(game);
+                }
+            }
+        }
+        return gameList;
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
