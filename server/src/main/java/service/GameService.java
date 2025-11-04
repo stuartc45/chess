@@ -29,7 +29,7 @@ public class GameService {
         while (true) {
             if (!gameIDs.contains(num)) {
                 gameIDs.add(num);
-                GameData game = new GameData(num, null, null, gameData.gameName(), null);
+                GameData game = new GameData(num, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), new ChessGame());
                 finalGameID = dataAccess.createGame(game);
                 break;
             }
