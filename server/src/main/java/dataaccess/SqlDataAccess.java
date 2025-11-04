@@ -22,7 +22,7 @@ public class SqlDataAccess implements DataAccess {
         var statements = new String[] {
                 "DELETE FROM auth_data",
                 "DELETE FROM user_data",
-                "DELETE FROM game_data"
+                "TRUNCATE TABLE game_data"
         };
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String str : statements)
