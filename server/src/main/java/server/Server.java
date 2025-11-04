@@ -33,8 +33,13 @@ public class Server {
     }
 
     private void clear(Context context) throws DataAccessException {
-        userService.clear();
-        context.result("{}");
+        try {
+            userService.clear();
+            context.result("{}");
+        } catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Internal Server Error\"}");
+            context.status(500).result(message);
+        }
     }
 
     private void register(Context context) {

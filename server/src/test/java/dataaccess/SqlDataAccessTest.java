@@ -52,7 +52,17 @@ class SqlDataAccessTest {
     }
 
     @Test
+    void getUserBad() {
+
+    }
+
+    @Test
     void getAuth() {
+    }
+
+    @Test
+    void getAuthBad() {
+
     }
 
     @Test
@@ -65,11 +75,21 @@ class SqlDataAccessTest {
     }
 
     @Test
+    void deleteAuthBad() {
+
+    }
+
+    @Test
     void addAuth() throws DataAccessException {
         DataAccess db = new SqlDataAccess();
         var authData = new AuthData("joe", "xyz");
         db.addAuth(authData);
         assertEquals(authData, db.getAuth(authData.authToken()));
+    }
+
+    @Test
+    void addAuthBad() {
+        
     }
 
     @Test
@@ -81,7 +101,21 @@ class SqlDataAccessTest {
     }
 
     @Test
+    void createBadGame() throws DataAccessException {
+        DataAccess db = new SqlDataAccess();
+        var gameData = new GameData(null, null, null, "game1", new ChessGame());
+        var game2 = new GameData(1, null, null, "game2", new ChessGame());
+        db.createGame(gameData);
+        assertThrows(Exception.class, () -> db.createGame(game2));
+    }
+
+    @Test
     void getGame() {
+    }
+
+    @Test
+    void getGameBad() {
+
     }
 
     @Test
@@ -93,6 +127,11 @@ class SqlDataAccessTest {
         var game = db.getGame(1);
         assertEquals("player1", game.whiteUsername());
         assertEquals(game.blackUsername(), gameData.blackUsername());
+    }
+
+    @Test
+    void updateGameBad() {
+
     }
 
     @Test
@@ -113,5 +152,10 @@ class SqlDataAccessTest {
         listOfGames.add(gameData3);
         var gameList = db.getGameList();
         assertEquals(listOfGames, gameList);
+    }
+
+    @Test
+    void getGameListBad() {
+
     }
 }
