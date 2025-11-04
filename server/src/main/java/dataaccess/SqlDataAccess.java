@@ -25,10 +25,11 @@ public class SqlDataAccess implements DataAccess {
                 "TRUNCATE TABLE game_data"
         };
         try (Connection conn = DatabaseManager.getConnection()) {
-            for (String str : statements)
+            for (String str : statements) {
                 try (var preparedStatement = conn.prepareStatement(str)) {
                     preparedStatement.executeUpdate();
                 }
+            }
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -105,7 +106,9 @@ public class SqlDataAccess implements DataAccess {
                 var rs = preparedStatement.executeQuery();
                 GameData gameData = null;
                 if (rs.next()) {
-                    gameData = new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
+                    gameData = new GameData(rs.getInt(1),
+                            rs.getString(2), rs.getString(3),
+                            rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
                 }
                 return gameData;
             }
@@ -129,7 +132,9 @@ public class SqlDataAccess implements DataAccess {
             try (var preparedStatement = conn.prepareStatement(statement)) {
                 var rs = preparedStatement.executeQuery();
                 while (rs.next()) {
-                    GameData game = new GameData(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
+                    GameData game = new GameData(rs.getInt(1),
+                            rs.getString(2), rs.getString(3),
+                            rs.getString(4), new Gson().fromJson(rs.getString(5), ChessGame.class));
                     gameList.add(game);
                 }
             }
@@ -142,13 +147,14 @@ public class SqlDataAccess implements DataAccess {
             try (PreparedStatement str = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     Object param = params[i];
-                    switch (param) {
-                        case String s -> str.setString(i + 1, s);
-                        case ChessGame s -> str.setString(i + 1, new Gson().toJson(s));
-                        case Integer s -> str.setInt(i + 1, s);
-                        case null -> str.setNull(i + 1, NULL);
-                        default -> {
-                        }
+                    if (param instanceof String s) {
+                        str.setString(i + 1, s);
+                    } else if (param instanceof ChessGame s) {
+                        str.setString(i + 1, new Gson().toJson(s));
+                    } else if (param instanceof Integer s) {
+                        str.setInt(i + 1, s);
+                    } else if (param == null) {
+                        str.setNull(i + 1, NULL);
                     }
                 }
                 str.executeUpdate();

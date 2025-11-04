@@ -25,17 +25,17 @@ public class GameService {
 
         GameData tempGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), new ChessGame());
         int num = 1;
-        int ID;
+        int finalGameID;
         while (true) {
             if (!gameIDs.contains(num)) {
                 gameIDs.add(num);
                 GameData game = new GameData(num, null, null, gameData.gameName(), null);
-                ID = dataAccess.createGame(game);
+                finalGameID = dataAccess.createGame(game);
                 break;
             }
             num++;
         }
-        return ID;
+        return finalGameID;
 
     }
 
