@@ -2,10 +2,12 @@ package service;
 
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.JoinGameData;
 import datamodel.UserData;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,10 +16,8 @@ class GameServiceTest {
     void createGameTest() throws Exception {
         DataAccess db = new MemoryDataAccess();
         var gameService = new GameService(db);
-        var userService = new UserService(db);
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
-        db.createUser(user);
-        var authData = userService.login(user);
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
         var gameData = new GameData(null, null, null, "newGame", null);
         var gameID = gameService.createGame(authData.authToken(), gameData);
         assertEquals(1, gameID);
@@ -36,10 +36,8 @@ class GameServiceTest {
     void joinGameTest() throws Exception {
         DataAccess db = new MemoryDataAccess();
         var gameService = new GameService(db);
-        var userService = new UserService(db);
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
-        db.createUser(user);
-        var authData = userService.login(user);
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
         var gameData = new GameData(null, null, null, "newGame", null);
         var gameID = gameService.createGame(authData.authToken(), gameData);
         gameService.joinGame(authData.authToken(), new JoinGameData("white", gameID));
@@ -51,10 +49,8 @@ class GameServiceTest {
     void joinGameWhereColorNotNormal() throws Exception {
         DataAccess db = new MemoryDataAccess();
         var gameService = new GameService(db);
-        var userService = new UserService(db);
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
-        db.createUser(user);
-        var authData = userService.login(user);
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
         var gameData = new GameData(null, "bill", null, "newGame", null);
         var gameID = gameService.createGame(authData.authToken(), gameData);
         assertThrows(Exception.class, () -> gameService.joinGame(authData.authToken(), new JoinGameData("green", gameID)));
@@ -64,10 +60,8 @@ class GameServiceTest {
     void listGamesTest() throws Exception {
         DataAccess db = new MemoryDataAccess();
         var gameService = new GameService(db);
-        var userService = new UserService(db);
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
-        db.createUser(user);
-        var authData = userService.login(user);
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
         var gameData = new GameData(null, "bill", null, "newGame", null);
         var gameID = gameService.createGame(authData.authToken(), gameData);
         gameService.joinGame(authData.authToken(), new JoinGameData("white", gameID));
@@ -81,9 +75,8 @@ class GameServiceTest {
         DataAccess db = new MemoryDataAccess();
         var gameService = new GameService(db);
         var userService = new UserService(db);
-        var user = new UserData("joe", "j@j.com", "toomanysecrets");
-        db.createUser(user);
-        var authData = userService.login(user);
+        var authData = new AuthData("joe", "xyz");
+        db.addAuth(authData);
         var gameData = new GameData(null, "bill", null, "newGame", null);
         var gameID = gameService.createGame(authData.authToken(), gameData);
         gameService.joinGame(authData.authToken(), new JoinGameData("white", gameID));

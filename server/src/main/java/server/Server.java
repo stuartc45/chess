@@ -36,8 +36,8 @@ public class Server {
         try {
             userService.clear();
             context.result("{}");
-        } catch (DataAccessException e) {
-            var message = String.format("{\"message\": \"Internal Server Error\"}");
+        } catch (Exception e) {
+            var message = String.format("{\"message\": \"Internal Server Error: %s\"}", e.getMessage());
             context.status(500).result(message);
         }
     }
@@ -51,6 +51,9 @@ public class Server {
             // call to the service and register
             var authData=userService.register(user);
             context.result(serializer.toJson(authData));
+        } catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
             if (ex.getMessage().equals("already taken")) {
@@ -70,6 +73,9 @@ public class Server {
 
             var authData = userService.login(user);
             context.result(serializer.toJson(authData));
+        } catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             catchException(ex, context);
         }
@@ -81,6 +87,9 @@ public class Server {
 
             userService.logout(data);
             context.status(200).result("{}");
+        } catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             catchException(ex, context);
         }
@@ -94,6 +103,9 @@ public class Server {
             List<GameData> gameList = gameService.listGames(data);
             var returnData = String.format("{ \"games\": %s }", serializer.toJson(gameList));
             context.result(returnData);
+        } catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             catchException(ex, context);
         }
@@ -109,6 +121,10 @@ public class Server {
             int gameID = gameService.createGame(header, data);
             var returnData = String.format("{\"gameID\": %d }", gameID);
             context.result(returnData);
+        }
+        catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             catchException(ex, context);
         }
@@ -123,6 +139,10 @@ public class Server {
 
             gameService.joinGame(header, data);
             context.result("{}");
+        }
+        catch (DataAccessException e) {
+            var message = String.format("{\"message\": \"Error: %s\" }", e.getMessage());
+            context.status(500).result(message);
         } catch (Exception ex) {
             var message = String.format("{\"message\": \"Error: %s\" }", ex.getMessage());
             if (ex.getMessage().equals("unauthorized")) {

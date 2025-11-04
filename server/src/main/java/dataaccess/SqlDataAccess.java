@@ -30,7 +30,7 @@ public class SqlDataAccess implements DataAccess {
                     preparedStatement.executeUpdate();
                 }
         } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("failed");
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public class SqlDataAccess implements DataAccess {
             }
         }
         catch (SQLException e) {
-            throw new DataAccessException("failed");
+            throw new DataAccessException(e.getMessage());
         }
     }
 
@@ -74,7 +74,7 @@ public class SqlDataAccess implements DataAccess {
             }
         }
         catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("failed");
+            throw new DataAccessException(e.getMessage());
         }
     }
 

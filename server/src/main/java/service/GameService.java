@@ -9,6 +9,7 @@ import java.util.*;
 
 public class GameService {
     private final DataAccess dataAccess;
+    private List<Integer> gameIDs = new ArrayList<>();
 
     public GameService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
@@ -23,7 +24,19 @@ public class GameService {
         }
 
         GameData tempGame = new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), new ChessGame());
-        return dataAccess.createGame(tempGame);
+        int num = 1;
+        int ID;
+        while (true) {
+            if (!gameIDs.contains(num)) {
+                gameIDs.add(num);
+                GameData game = new GameData(num, null, null, gameData.gameName(), null);
+                ID = dataAccess.createGame(game);
+                break;
+            }
+            num++;
+        }
+        return ID;
+
     }
 
     public void joinGame(String authToken, JoinGameData joinData) throws Exception {
