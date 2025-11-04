@@ -5,9 +5,7 @@ import dataaccess.MemoryDataAccess;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.JoinGameData;
-import datamodel.UserData;
 import org.junit.jupiter.api.Test;
-import org.mindrot.jbcrypt.BCrypt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
