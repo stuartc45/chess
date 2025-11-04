@@ -15,9 +15,15 @@ public class Server {
     private final Javalin server;
     private final UserService userService;
     private final GameService gameService;
+    private DataAccess dataAccess;
 
-    public Server() throws DataAccessException {
-        var dataAccess = new SqlDataAccess();
+    public Server() {
+        try {
+            dataAccess = new SqlDataAccess();
+        } catch (Exception e) {
+            dataAccess = new MemoryDataAccess();
+        }
+        
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
