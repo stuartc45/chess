@@ -15,16 +15,19 @@ public class LoggedOutClient {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to chess! Type \"help\" to get help!");
-        printPrompt();
-        
+
         var result = "";
-        String line = scanner.nextLine();
-        result = eval(line);
+        while (!result.equals("quit")) {
+            printPrompt();
+            String line = scanner.nextLine();
+            result = eval(line);
+            System.out.println(result);
+        }
     }
 
     private String eval(String input) {
         if (input.equals("help")) {
-            help();
+            return help();
         }
         return "";
     }
@@ -33,10 +36,11 @@ public class LoggedOutClient {
         System.out.print("\n" + SET_TEXT_COLOR_BLACK + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
-    private void help() {
-        System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - to create an account");
-        System.out.println("login <USERNAME> <PASSWORD> - to log in");
-        System.out.println("quit - to exit the program");
-        System.out.println("help - to print possible commands");
+    private String help() {
+        return """
+        register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+        login <USERNAME> <PASSWORD> - to log in
+        quit - to exit the program
+        help - to print possible commands""";
     }
 }
