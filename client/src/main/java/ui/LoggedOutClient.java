@@ -26,10 +26,13 @@ public class LoggedOutClient {
     }
 
     private String eval(String input) {
-        if (input.equals("help")) {
-            return help();
-        }
-        return "";
+        String[] cmds = input.toLowerCase().split(" ");
+        String cmd = cmds[0];
+        return switch (cmd) {
+            case "help" -> help();
+            case "quit" -> "quit";
+            default -> "";
+        };
     }
 
     private void printPrompt() {
