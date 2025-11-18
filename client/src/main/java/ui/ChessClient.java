@@ -3,14 +3,15 @@ package ui;
 import server.ServerFacade;
 
 import java.util.Scanner;
-import java.util.Arrays
+import java.util.Arrays;
 import static ui.EscapeSequences.*;
 
-public class LoggedOutClient {
-    private final ServerFacade server;
+public class ChessClient {
+    private final ServerFacade serverFacade;
+    private States state = States.SIGNEDOUT;
 
-    public LoggedOutClient(String serverUrl) {
-        server = new ServerFacade(serverUrl);
+    public ChessClient(String serverUrl) {
+        this.serverFacade = new ServerFacade(serverUrl);
     }
 
     public void run() {
@@ -52,10 +53,15 @@ public class LoggedOutClient {
     }
 
     private String login(String[] params) {
+        serverFacade.login(params);
+        // TODO Add the functionality to switch to the logged in client or not
         return "";
     }
 
     private String register(String[] params) {
+        serverFacade.register(params);
+        // TODO Add functionality for switching to logged in client or not
+        LoggedInClient loggedIn = new LoggedInClient(serverFacade);
         return "";
     }
 }

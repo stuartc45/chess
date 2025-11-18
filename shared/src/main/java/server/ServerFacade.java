@@ -6,4 +6,12 @@ public class ServerFacade {
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
     }
+
+    public void login(String[] params) {
+
+    }
+
+    public void register(String[] params) {
+
+    }
 }
