@@ -39,6 +39,8 @@ public class ChessClient {
             case "logout" -> logout();
             case "create" -> createGame(params);
             case "list" -> listGames();
+            case "join" -> joinGame(params);
+            case "observe" -> observeGame(params);
             default -> "";
         };
     }
@@ -72,14 +74,14 @@ public class ChessClient {
     }
 
     private String login(String[] params) {
-        serverFacade.login(params);
+        serverFacade.login(params[0], params[1]);
         // TODO Add the functionality to switch to the logged in client or not
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
 
     private String register(String[] params) {
-        serverFacade.register(params);
+        serverFacade.register(params[0], params[1], params[2]);
         // TODO Add functionality for switching to logged in client or not
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
@@ -99,5 +101,15 @@ public class ChessClient {
     private String listGames() {
         serverFacade.listGames();
         return "fake list";
+    }
+
+    private String joinGame(String[] params) {
+        serverFacade.joinGame(params[0], params[1]);
+        return String.format("Joined game %s", params[0]);
+    }
+
+    private String observeGame(String[] params) {
+        serverFacade.observeGame(params[0]);
+        return String.format("Observing game %s", params[0]);
     }
 }

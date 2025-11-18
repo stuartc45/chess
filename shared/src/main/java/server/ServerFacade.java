@@ -7,11 +7,11 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public void login(String[] params) {
+    public void login(String username, String password) {
 
     }
 
-    public void register(String[] params) {
+    public void register(String username, String password, String email) {
 
     }
 
@@ -24,6 +24,14 @@ public class ServerFacade {
     }
 
     public void listGames() {
+
+    }
+
+    public void joinGame(String gameID, String color) {
+
+    }
+
+    public void observeGame(String gameID) {
 
     }
 }
