@@ -37,6 +37,8 @@ public class ChessClient {
             case "login" -> login(params);
             case "register" -> register(params);
             case "logout" -> logout();
+            case "create" -> createGame(params);
+            case "list" -> listGames();
             default -> "";
         };
     }
@@ -87,5 +89,15 @@ public class ChessClient {
         serverFacade.logout();
         state = States.SIGNEDOUT;
         return "Logged out";
+    }
+
+    private String createGame(String[] params) {
+        serverFacade.createGame(params[0]);
+        return String.format("Created game %s", params[0]);
+    }
+
+    private String listGames() {
+        serverFacade.listGames();
+        return "fake list";
     }
 }

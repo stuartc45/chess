@@ -18,4 +18,12 @@ public class ServerFacade {
     public void logout() {
 
     }
+
+    public void createGame(String gameName) {
+
+    }
+
+    public void listGames() {
+
+    }
 }
