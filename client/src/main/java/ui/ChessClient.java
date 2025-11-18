@@ -22,8 +22,14 @@ public class ChessClient {
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
-            result = eval(line);
-            System.out.println(result);
+            try {
+                result = eval(line);
+                System.out.println(result);
+            } catch (Throwable e) {
+                var msg = e.toString();
+                System.out.print(msg);
+            }
+
         }
     }
 
@@ -75,14 +81,12 @@ public class ChessClient {
 
     private String login(String[] params) {
         serverFacade.login(params[0], params[1]);
-        // TODO Add the functionality to switch to the logged in client or not
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
 
     private String register(String[] params) {
         serverFacade.register(params[0], params[1], params[2]);
-        // TODO Add functionality for switching to logged in client or not
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
@@ -112,4 +116,10 @@ public class ChessClient {
         serverFacade.observeGame(params[0]);
         return String.format("Observing game %s", params[0]);
     }
+
+//    private void assertSignedIn() throws ResponseException {
+//        if (state == States.SIGNEDOUT) {
+//            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
+//        }
+//    }
 }

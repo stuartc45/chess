@@ -1,7 +1,10 @@
 package server;
 
+import java.net.http.HttpClient;
+
 public class ServerFacade {
     private final String serverUrl;
+    private final HttpClient client = HttpClient.newHttpClient();
 
     public ServerFacade(String serverUrl) {
         this.serverUrl = serverUrl;
