@@ -14,4 +14,8 @@ public class ServerFacade {
     public void register(String[] params) {
 
     }
+
+    public void logout() {
+
+    }
 }

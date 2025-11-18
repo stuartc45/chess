@@ -36,6 +36,7 @@ public class ChessClient {
             case "quit" -> "quit";
             case "login" -> login(params);
             case "register" -> register(params);
+            case "logout" -> logout();
             default -> "";
         };
     }
@@ -71,13 +72,20 @@ public class ChessClient {
     private String login(String[] params) {
         serverFacade.login(params);
         // TODO Add the functionality to switch to the logged in client or not
-        return "";
+        state = States.SIGNEDIN;
+        return String.format("Logged in as %s", params[0]);
     }
 
     private String register(String[] params) {
         serverFacade.register(params);
         // TODO Add functionality for switching to logged in client or not
-        LoggedInClient loggedIn = new LoggedInClient(serverFacade);
-        return "";
+        state = States.SIGNEDIN;
+        return String.format("Logged in as %s", params[0]);
+    }
+
+    private String logout() {
+        serverFacade.logout();
+        state = States.SIGNEDOUT;
+        return "Logged out";
     }
 }
