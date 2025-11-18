@@ -45,6 +45,22 @@ public class ChessClient {
     }
 
     private String help() {
+        if (state == States.SIGNEDOUT) {
+            return """
+                    register <USERNAME> <PASSWORD> <EMAIL> - create an account
+                    login <USERNAME> <PASSWORD> - log in
+                    quit - exit the program
+                    help - print possible commands""";
+        } else if (state == States.SIGNEDIN) {
+            return """
+                    create <NAME> - create a game
+                    list - lists the games
+                    join <ID> [WHITE|BLACK] - join a game
+                    observe <ID> - observe a game
+                    logout
+                    quit - exit the program
+                    help - print possible commands""";
+        }
         return """
         register <USERNAME> <PASSWORD> <EMAIL> - to create an account
         login <USERNAME> <PASSWORD> - to log in
