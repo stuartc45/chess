@@ -103,7 +103,7 @@ public class ChessClient {
 
     private String logout() throws ResponseException {
         assertSignedIn();
-        serverFacade.logout();
+        serverFacade.logout(authToken);
         state = States.SIGNEDOUT;
         return "Logged out";
     }

@@ -22,20 +22,22 @@ public class ServerFacade {
 
     public AuthData login(String username, String password) throws ResponseException {
         UserData loginRequest = new UserData(username, password, null);
-        var request = buildRequest("POST", "/session", loginRequest);
+        var request = buildRequest("POST", "/session", loginRequest, null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
     public AuthData register(String username, String password, String email) throws ResponseException {
         UserData registerRequest = new UserData(username, password, email);
-        var request = buildRequest("POST", "/user", registerRequest);
+        var request = buildRequest("POST", "/user", registerRequest, null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }
 
-    public void logout() {
-
+    public void logout(String authToken) throws ResponseException {
+        var request = buildRequest("DELETE", "/session", null, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void createGame(String gameName) {
@@ -54,13 +56,16 @@ public class ServerFacade {
 
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
                 .method(method, makeRequestBody(body));
-        if (body != null) {
-            request.setHeader("Content-Type", "application/json");
+        if (authToken != null) {
+            request.setHeader("authorization", authToken);
         }
+//        else {
+//            request.setHeader("Content-Type", "application/json");
+//        }
         return request.build();
     }
 

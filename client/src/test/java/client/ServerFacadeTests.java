@@ -1,5 +1,6 @@
 package client;
 
+import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
@@ -43,8 +44,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void register() throws Exception {
+    void register() throws ResponseException {
         var authData = facade.register("player1", "password", "p1@email.com");
+        assertTrue(authData.authToken().length() > 10);
+    }
+
+    @Test
+    void login() throws ResponseException {
+        var authData = facade.login("player1", "password");
         assertTrue(authData.authToken().length() > 10);
     }
 
