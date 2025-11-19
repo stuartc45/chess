@@ -1,5 +1,6 @@
 package ui;
 
+import exception.ResponseException;
 import server.ServerFacade;
 
 import java.util.Scanner;
@@ -34,21 +35,25 @@ public class ChessClient {
     }
 
     private String eval(String input) {
-        String[] cmds = input.toLowerCase().split(" ");
-        String cmd = cmds[0];
-        String[] params = Arrays.copyOfRange(cmds, 1, cmds.length);
-        return switch (cmd) {
-            case "help" -> help();
-            case "quit" -> "quit";
-            case "login" -> login(params);
-            case "register" -> register(params);
-            case "logout" -> logout();
-            case "create" -> createGame(params);
-            case "list" -> listGames();
-            case "join" -> joinGame(params);
-            case "observe" -> observeGame(params);
-            default -> "";
-        };
+        try {
+            String[] cmds = input.toLowerCase().split(" ");
+            String cmd = cmds[0];
+            String[] params = Arrays.copyOfRange(cmds, 1, cmds.length);
+            return switch (cmd) {
+                case "help" -> help();
+                case "quit" -> "quit";
+                case "login" -> login(params);
+                case "register" -> register(params);
+                case "logout" -> logout();
+                case "create" -> createGame(params);
+                case "list" -> listGames();
+                case "join" -> joinGame(params);
+                case "observe" -> observeGame(params);
+                default -> "";
+            };
+        } catch (ResponseException ex) {
+            return ex.getMessage();
+        }
     }
 
     private void printPrompt() {
@@ -79,7 +84,7 @@ public class ChessClient {
         help - to print possible commands""";
     }
 
-    private String login(String[] params) {
+    private String login(String[] params) throws ResponseException {
         serverFacade.login(params[0], params[1]);
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
@@ -117,9 +122,9 @@ public class ChessClient {
         return String.format("Observing game %s", params[0]);
     }
 
-//    private void assertSignedIn() throws ResponseException {
-//        if (state == States.SIGNEDOUT) {
-//            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
-//        }
-//    }
+    private void assertSignedIn() throws ResponseException {
+        if (state == States.SIGNEDOUT) {
+            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
+        }
+    }
 }

@@ -9,6 +9,8 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import datamodel.*;
+import exception.ResponseException;
 
 public class ServerFacade {
     private final String serverUrl;
@@ -18,8 +20,11 @@ public class ServerFacade {
         this.serverUrl = serverUrl;
     }
 
-    public void login(String username, String password) {
-
+    public AuthData login(String username, String password) throws ResponseException {
+        UserData loginRequest = new UserData(username, password, null);
+        var request = buildRequest("POST", "/session", loginRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
     }
 
     public void register(String username, String password, String email) {
@@ -64,11 +69,29 @@ public class ServerFacade {
         }
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws Exception {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws ResponseException {
         try {
             return client.send(request, BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new Exception("Server error" + ex.getMessage());
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
+    }
+
+    private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws ResponseException {
+        var status = response.statusCode();
+        if (status != 200) {
+            var body = response.body();
+            if (body != null) {
+                throw ResponseException.fromJson(body);
+            }
+
+            throw new ResponseException(ResponseException.fromHttpStatusCode(status), "other failure: " + status);
+        }
+
+        if (responseClass != null) {
+            return new Gson().fromJson(response.body(), responseClass);
+        }
+
+        return null;
     }
 }
