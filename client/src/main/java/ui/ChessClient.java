@@ -96,28 +96,33 @@ public class ChessClient {
         return String.format("Logged in as %s", params[0]);
     }
 
-    private String logout() {
+    private String logout() throws ResponseException {
+        assertSignedIn();
         serverFacade.logout();
         state = States.SIGNEDOUT;
         return "Logged out";
     }
 
-    private String createGame(String[] params) {
+    private String createGame(String[] params) throws ResponseException {
+        assertSignedIn();
         serverFacade.createGame(params[0]);
         return String.format("Created game %s", params[0]);
     }
 
-    private String listGames() {
+    private String listGames() throws ResponseException {
+        assertSignedIn();
         serverFacade.listGames();
         return "fake list";
     }
 
-    private String joinGame(String[] params) {
+    private String joinGame(String[] params) throws ResponseException {
+        assertSignedIn();
         serverFacade.joinGame(params[0], params[1]);
         return String.format("Joined game %s", params[0]);
     }
 
-    private String observeGame(String[] params) {
+    private String observeGame(String[] params) throws ResponseException {
+        assertSignedIn();
         serverFacade.observeGame(params[0]);
         return String.format("Observing game %s", params[0]);
     }
