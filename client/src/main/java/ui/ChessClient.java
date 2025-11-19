@@ -57,7 +57,11 @@ public class ChessClient {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + SET_TEXT_COLOR_BLACK + ">>> " + SET_TEXT_COLOR_GREEN);
+        if (state == States.SIGNEDOUT) {
+            System.out.println("\n" + SET_TEXT_COLOR_BLACK + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);
+        } else {
+            System.out.println("\n" + SET_TEXT_COLOR_BLACK + "[LOGGED IN] >>> " + SET_TEXT_COLOR_GREEN);
+        }
     }
 
     private String help() {
