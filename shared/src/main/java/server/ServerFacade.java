@@ -27,8 +27,11 @@ public class ServerFacade {
         return handleResponse(response, AuthData.class);
     }
 
-    public void register(String username, String password, String email) {
-
+    public AuthData register(String username, String password, String email) throws ResponseException {
+        UserData registerRequest = new UserData(username, password, email);
+        var request = buildRequest("POST", "/user", registerRequest);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
     }
 
     public void logout() {

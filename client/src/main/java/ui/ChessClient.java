@@ -10,6 +10,7 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
     private final ServerFacade serverFacade;
     private States state = States.SIGNEDOUT;
+    private String authToken;
 
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -89,13 +90,13 @@ public class ChessClient {
     }
 
     private String login(String[] params) throws ResponseException {
-        serverFacade.login(params[0], params[1]);
+        authToken = serverFacade.login(params[0], params[1]).authToken();
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
 
-    private String register(String[] params) {
-        serverFacade.register(params[0], params[1], params[2]);
+    private String register(String[] params) throws ResponseException {
+        authToken = serverFacade.register(params[0], params[1], params[2]).authToken();
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
