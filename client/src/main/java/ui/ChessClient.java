@@ -1,5 +1,6 @@
 package ui;
 
+import datamodel.GameData;
 import exception.ResponseException;
 import server.ServerFacade;
 
@@ -50,6 +51,7 @@ public class ChessClient {
                 case "list" -> listGames();
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
+                case "clear" -> clearDb();
                 default -> "";
             };
         } catch (ResponseException ex) {
@@ -59,9 +61,9 @@ public class ChessClient {
 
     private void printPrompt() {
         if (state == States.SIGNEDOUT) {
-            System.out.println("\n" + SET_TEXT_COLOR_BLACK + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);
+            System.out.println("\n" + SET_TEXT_COLOR_BLUE + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);
         } else {
-            System.out.println("\n" + SET_TEXT_COLOR_BLACK + "[LOGGED IN] >>> " + SET_TEXT_COLOR_GREEN);
+            System.out.println("\n" + SET_TEXT_COLOR_YELLOW + "[LOGGED IN] >>> " + SET_TEXT_COLOR_GREEN);
         }
     }
 
@@ -110,26 +112,33 @@ public class ChessClient {
 
     private String createGame(String[] params) throws ResponseException {
         assertSignedIn();
-        serverFacade.createGame(params[0]);
-        return String.format("Created game %s", params[0]);
+        GameData gameData = serverFacade.createGame(params[0], authToken);
+        return String.format("Created game %s", gameData.gameName());
     }
 
     private String listGames() throws ResponseException {
         assertSignedIn();
-        serverFacade.listGames();
+        serverFacade.listGames(authToken);
         return "fake list";
     }
 
     private String joinGame(String[] params) throws ResponseException {
         assertSignedIn();
-        serverFacade.joinGame(params[0], params[1]);
+        serverFacade.joinGame(params[0], params[1], authToken);
         return String.format("Joined game %s", params[0]);
     }
 
     private String observeGame(String[] params) throws ResponseException {
         assertSignedIn();
-        serverFacade.observeGame(params[0]);
+        serverFacade.observeGame(params[0], authToken);
         return String.format("Observing game %s", params[0]);
+    }
+
+    private String clearDb() throws ResponseException {
+        assertSignedIn();
+        serverFacade.clearDb();
+        state = States.SIGNEDOUT;
+        return "Database cleared";
     }
 
     private void assertSignedIn() throws ResponseException {

@@ -40,20 +40,29 @@ public class ServerFacade {
         handleResponse(response, null);
     }
 
-    public void createGame(String gameName) {
+    public GameData createGame(String gameName, String authToken) throws ResponseException {
+        GameData gameData = new GameData(null, null, null, gameName, null);
+        var request = buildRequest("POST", "/game", gameData, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, GameData.class);
+    }
+
+    public void listGames(String authToken) {
 
     }
 
-    public void listGames() {
+    public void joinGame(String gameID, String color, String authToken) {
 
     }
 
-    public void joinGame(String gameID, String color) {
+    public void observeGame(String gameID, String authToken) {
 
     }
 
-    public void observeGame(String gameID) {
-
+    public void clearDb() throws ResponseException {
+        var request = buildRequest("DELETE", "/db", null, null);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {

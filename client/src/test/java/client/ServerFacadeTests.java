@@ -8,6 +8,7 @@ import server.ServerFacade;
 import java.net.URI;
 import java.net.http.HttpRequest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -26,11 +27,14 @@ public class ServerFacadeTests {
         facade = new ServerFacade(serverUrl);
     }
 
-//    @BeforeEach
-//    public void clearDb() {
-//        HttpRequest request = HttpRequest.newBuilder()
-//                .uri(new URI(serverUrl))
-//    }
+    @BeforeEach
+    public void clearDb() {
+        try {
+            facade.clearDb();
+        } catch (Throwable ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 
     @AfterAll
     static void stopServer() {
@@ -51,8 +55,17 @@ public class ServerFacadeTests {
 
     @Test
     void login() throws ResponseException {
+        facade.register("player1", "password", "p1@email.com");
         var authData = facade.login("player1", "password");
         assertTrue(authData.authToken().length() > 10);
     }
 
+    @Test
+    void createGame() throws ResponseException {
+        var authData = facade.register("player1", "password", "p1@email.com");
+        var gameData = facade.createGame("game1", authData.authToken());
+        System.out.println(gameData);
+        assertEquals("game1", gameData.gameName());
+        assertTrue(gameData.gameID() != null);
+    }
 }
