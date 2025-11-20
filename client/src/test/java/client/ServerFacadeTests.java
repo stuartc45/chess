@@ -8,8 +8,7 @@ import server.ServerFacade;
 import java.net.URI;
 import java.net.http.HttpRequest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class ServerFacadeTests {
@@ -41,40 +40,87 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
     @Test
-    public void sampleTest() {
-        assertTrue(true);
-    }
-
-    @Test
-    void register() throws ResponseException {
+    void register() throws Exception {
         var authData = facade.register("player1", "password", "p1@email.com");
         assertTrue(authData.authToken().length() > 10);
     }
 
     @Test
-    void login() throws ResponseException {
+    void badRegister() throws Exception {
+        var authData = facade.register("player1", "password", "p1@email.com");
+        assertThrows(Exception.class, () -> facade.register("player1", "otherpassword", "email@email.com"));
+    }
+
+    @Test
+    void login() throws Exception {
         facade.register("player1", "password", "p1@email.com");
         var authData = facade.login("player1", "password");
         assertTrue(authData.authToken().length() > 10);
     }
 
     @Test
-    void createGame() throws ResponseException {
+    void badLogin() throws Exception {
+        assertThrows(Exception.class, () -> facade.login("player1", "password"));
+    }
+
+    @Test
+    void logout() throws Exception {
+        var authData = facade.register("player1", "password", "p1@email.com");
+        facade.logout(authData.authToken());
+        assertThrows(Exception.class, () -> facade.logout(authData.authToken()));
+    }
+
+    @Test
+    void badLogout() throws Exception {
+        var authData = facade.register("player1", "password", "p1@email.com");
+        assertThrows(Exception.class, () -> facade.logout(null));
+    }
+
+    @Test
+    void createGame() throws Exception {
         var authData = facade.register("player1", "password", "p1@email.com");
         var gameData = facade.createGame("game1", authData.authToken());
-        System.out.println(gameData);
         assertTrue(gameData.gameID() != null);
     }
 
     @Test
-    void listGames() throws ResponseException {
+    void badCreateGame() throws Exception {
+        var authData = facade.register("player1", "password", "p1@email.com");
+        assertThrows(Exception.class, () -> facade.createGame("game1", "fake"));
+    }
+
+    @Test
+    void listGames() throws Exception {
         var authToken = facade.register("joe", "joe", "joe").authToken();
         var gameData1 = facade.createGame("game1", authToken);
         var gameData2 = facade.createGame("game2", authToken);
         var games = facade.listGames(authToken);
         assertEquals(gameData1.gameID(), games.get(0).gameID());
         assertEquals(gameData2.gameID(), games.get(1).gameID());
+    }
+
+    @Test
+    void badListGames() throws Exception {
+        var authToken = facade.register("joe", "joe", "joe").authToken();
+        var gameData1 = facade.createGame("game1", authToken);
+        var gameData2 = facade.createGame("game2", authToken);
+        assertThrows(Exception.class, () -> facade.listGames(null));
+    }
+
+    @Test
+    void joinGame() throws Exception {
+        var authToken = facade.register("joe", "joe", "joe").authToken();
+        var gameData = facade.createGame("game1", authToken);
+        facade.joinGame(gameData.gameID(), "white", authToken);
+        assertThrows(Exception.class, () -> facade.joinGame(gameData.gameID(), "white", authToken));
+    }
+
+    @Test
+    void badJoinGame() throws Exception {
+        var authToken = facade.register("joe", "joe", "joe").authToken();
+        var gameData = facade.createGame("game1", authToken);
+        assertThrows(Exception.class, () -> facade.joinGame(null, "white", authToken));
+
     }
 }
