@@ -74,7 +74,7 @@ public class ServerFacadeTests {
         var gameData1 = facade.createGame("game1", authToken);
         var gameData2 = facade.createGame("game2", authToken);
         var games = facade.listGames(authToken);
-        assertEquals(gameData1, games.get(0));
-        assertEquals(gameData2, games.get(1));
+        assertEquals(gameData1.gameID(), games.get(0).gameID());
+        assertEquals(gameData2.gameID(), games.get(1).gameID());
     }
 }

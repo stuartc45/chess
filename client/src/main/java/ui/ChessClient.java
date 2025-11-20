@@ -125,11 +125,19 @@ public class ChessClient {
 
     private String listGames() throws ResponseException {
         assertSignedIn();
-        GameList gameList = serverFacade.listGames(authToken);
+        var games = serverFacade.listGames(authToken);
         var result = new StringBuilder();
-        var gson = new Gson();
-        for (GameData game : gameList) {
-            result.append(gson.toJson(game)).append('\n');
+        for (int i = 0; i < games.size(); i++) {
+            var game = games.get(i);
+            int gameSpot = i + 1;
+            String white = (game.whiteUsername() == null) ? "---" : game.whiteUsername();
+            String black = (game.blackUsername() == null) ? "---" : game.blackUsername();
+            result.append("Game ")
+                    .append(gameSpot).append(": ")
+                    .append("GameName: ").append(game.gameName())
+                    .append(" White: ").append(white)
+                    .append(" Black: ").append(black)
+                    .append("\n");
         }
         return result.toString();
     }
@@ -143,7 +151,6 @@ public class ChessClient {
 
     private String observeGame(String[] params) throws ResponseException {
         assertSignedIn();
-        serverFacade.observeGame(params[0], authToken);
         return String.format("Observing game %s", params[0]);
     }
 

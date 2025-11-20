@@ -9,6 +9,8 @@ import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.List;
+
 import datamodel.*;
 import exception.ResponseException;
 
@@ -47,10 +49,10 @@ public class ServerFacade {
         return handleResponse(response, GameData.class);
     }
 
-    public GameList listGames(String authToken) throws ResponseException {
+    public List<GameData> listGames(String authToken) throws ResponseException {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
-        return handleResponse(response, GameList.class);
+        return handleResponse(response, GameList.class).getGames();
     }
 
     public void joinGame(Integer gameID, String color, String authToken) throws ResponseException {
@@ -59,10 +61,6 @@ public class ServerFacade {
         var response = sendRequest(request);
         handleResponse(response, null);
     }
-
-//    public void observeGame(String gameID, String authToken) {
-//
-//    }
 
     public void clearDb() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
