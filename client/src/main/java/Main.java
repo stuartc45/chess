@@ -5,10 +5,12 @@ import ui.PrintChessBoard;
 
 public class Main {
     public static void main(String[] args) {
-        var printing = new PrintChessBoard("white");
+        var white = new PrintChessBoard("white");
+        var black = new PrintChessBoard("black");
         var board = new ChessBoard();
         board.resetBoard();
-        printing.printBoard(board);
+        white.printBoard(board);
+        black.printBoard(board);
 //        if (args.length > 2) {
 //            new ChessClient("http://localhost:" + args[1]).run();
 //        } else {

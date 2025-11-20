@@ -18,28 +18,33 @@ public class PrintChessBoard {
      public void printBoard(ChessBoard board) {
         Boolean isWhite = color.equalsIgnoreCase("white");
         var boardString = new StringBuilder();
+        String letters = isWhite ? "    a   b   c  d   e  f   g   h    " : "    h   g   f  e   d  c   b   a    ";
         boardString.append(SET_BG_COLOR_RED)
-                .append("    a   b   c  d   e  f   g   h    ")
+                .append(letters)
                 .append(RESET_BG_COLOR)
                 .append("\n");
         for (int i = 0; i < 8; i++) {
-            boardString.append(SET_BG_COLOR_RED).append(" ").append(8 - i).append(" ");
+            int rowNum = isWhite ? 8 - i : i + 1;
+            boardString.append(SET_BG_COLOR_RED).append(" ").append(rowNum).append(" ");
             for (int j = 0; j < 8; j++) {
+                int colNum = isWhite ? j + 1 : 8 - j;
                 if ((i + j)% 2 == 0) {
                     boardString.append(SET_BG_COLOR_LIGHT_GREY);
                 } else {
                     boardString.append(SET_BG_COLOR_BLACK);
                 }
-                boardString.append(getPieceSymbol(board.getPiece(new ChessPosition(8-i, 8-j))));
+                boardString.append(getPieceSymbol(board.getPiece(new ChessPosition(rowNum, colNum))));
             }
             boardString.append(SET_BG_COLOR_RED)
                     .append(" ")
-                    .append(8 - i)
+                    .append(rowNum)
                     .append(" ")
                     .append(RESET_BG_COLOR)
                     .append("\n");
         }
-        boardString.append(SET_BG_COLOR_RED).append("    a   b   c  d   e  f   g   h    ").append(RESET_BG_COLOR);
+        boardString.append(SET_BG_COLOR_RED)
+                .append(letters)
+                .append(RESET_BG_COLOR);
         System.out.println(boardString.toString());
      }
 
