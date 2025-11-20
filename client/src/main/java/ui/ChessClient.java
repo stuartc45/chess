@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
@@ -196,6 +197,12 @@ public class ChessClient {
         try {
             Integer gameID = gameMap.get(Integer.valueOf(params[0]));
             serverFacade.joinGame(gameID, params[1], authToken);
+            System.out.println(RESET_TEXT_COLOR);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            PrintChessBoard printChessBoard = new PrintChessBoard(params[1]);
+            printChessBoard.printBoard(board);
+            System.out.println(SET_TEXT_COLOR_GREEN);
             return String.format("Joined game %s", params[0]);
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
@@ -213,6 +220,10 @@ public class ChessClient {
         }
         try {
             Integer listID = Integer.valueOf(params[0]);
+            ChessBoard board = new ChessBoard();
+            board.resetBoard();
+            PrintChessBoard printChessBoard = new PrintChessBoard("white");
+            printChessBoard.printBoard(board);
             return String.format("Observing game %s", params[0]);
         } catch (Exception ex) {
             throw new Exception("Observe failed with " + ex.getMessage());
