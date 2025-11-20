@@ -97,12 +97,22 @@ public class ChessClient {
     }
 
     private String login(String[] params) throws ResponseException {
+        if (params.length < 2) {
+            return "Please enter both a username and password";
+        } else if (params.length > 2) {
+            return "Please only enter a username and password";
+        }
         authToken = serverFacade.login(params[0], params[1]).authToken();
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
     }
 
     private String register(String[] params) throws ResponseException {
+        if (params.length < 3) {
+            return "Please enter username, password, and email";
+        } else if (params.length > 3) {
+            return "Please only enter username, password, and email";
+        }
         authToken = serverFacade.register(params[0], params[1], params[2]).authToken();
         state = States.SIGNEDIN;
         return String.format("Logged in as %s", params[0]);
@@ -116,6 +126,12 @@ public class ChessClient {
     }
 
     private String createGame(String[] params) throws ResponseException {
+        if (params.length == 0) {
+            return "Please include a gameName";
+        }
+        if (params.length > 1) {
+            return "Please only include a gameName";
+        }
         assertSignedIn();
         GameData gameData = serverFacade.createGame(params[0], authToken);
         gameMap.put(clientGameId, gameData.gameID());
@@ -143,6 +159,12 @@ public class ChessClient {
     }
 
     private String joinGame(String[] params) throws ResponseException {
+        if (params.length < 2) {
+            return "Please include both the ID of the game and your desired color";
+        }
+        if (params.length > 2) {
+            return "Please only include the ID of the game and your desired color";
+        }
         assertSignedIn();
         Integer gameID = gameMap.get(Integer.valueOf(params[0]));
         serverFacade.joinGame(gameID, params[1], authToken);
@@ -150,7 +172,14 @@ public class ChessClient {
     }
 
     private String observeGame(String[] params) throws ResponseException {
+        if (params.length == 0) {
+            return "Please include the ID of the game you wish to observe";
+        }
+        if (params.length > 1) {
+            return "Please only include the ID of the game you wish to observe";
+        }
         assertSignedIn();
+        Integer listID = Integer.valueOf(params[0]);
         return String.format("Observing game %s", params[0]);
     }
 
