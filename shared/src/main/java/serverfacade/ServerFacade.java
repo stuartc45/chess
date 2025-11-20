@@ -1,4 +1,4 @@
-package server;
+package serverfacade;
 
 import com.google.gson.Gson;
 
@@ -12,7 +12,6 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.util.List;
 
 import datamodel.*;
-import exception.ResponseException;
 
 public class ServerFacade {
     private final String serverUrl;

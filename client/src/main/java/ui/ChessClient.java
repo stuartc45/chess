@@ -4,7 +4,7 @@ import chess.ChessBoard;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
-import server.ServerFacade;
+import serverfacade.ServerFacade;
 
 import java.util.HashMap;
 import java.util.Scanner;

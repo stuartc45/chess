@@ -1,12 +1,8 @@
 package client;
 
-import exception.ResponseException;
 import org.junit.jupiter.api.*;
 import server.Server;
-import server.ServerFacade;
-
-import java.net.URI;
-import java.net.http.HttpRequest;
+import serverfacade.ServerFacade;
 
 import static org.junit.jupiter.api.Assertions.*;
 
