@@ -130,9 +130,13 @@ public class ChessClient {
 
     private String logout() throws Exception {
         assertSignedIn();
-        serverFacade.logout(authToken);
-        state = States.SIGNEDOUT;
-        return "Logged out";
+        try {
+            serverFacade.logout(authToken);
+            state = States.SIGNEDOUT;
+            return "Logged out";
+        } catch (Exception ex) {
+            throw new Exception("Logout failed with " + ex.getMessage());
+        }
     }
 
     private String createGame(String[] params) throws Exception {
@@ -143,29 +147,37 @@ public class ChessClient {
         if (params.length > 1) {
             return "Please only include a gameName";
         }
-        GameData gameData = serverFacade.createGame(params[0], authToken);
-        gameMap.put(clientGameId, gameData.gameID());
-        clientGameId++;
-        return String.format("Created game %s", params[0]);
+        try {
+            GameData gameData = serverFacade.createGame(params[0], authToken);
+            gameMap.put(clientGameId, gameData.gameID());
+            clientGameId++;
+            return String.format("Created game %s", params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Create failed with " + ex.getMessage());
+        }
     }
 
     private String listGames() throws Exception {
         assertSignedIn();
-        var games = serverFacade.listGames(authToken);
-        var result = new StringBuilder();
-        for (int i = 0; i < games.size(); i++) {
-            var game = games.get(i);
-            int gameSpot = i + 1;
-            String white = (game.whiteUsername() == null) ? "---" : game.whiteUsername();
-            String black = (game.blackUsername() == null) ? "---" : game.blackUsername();
-            result.append("Game ")
-                    .append(gameSpot).append(": ")
-                    .append("GameName: ").append(game.gameName())
-                    .append(" White: ").append(white)
-                    .append(" Black: ").append(black)
-                    .append("\n");
+        try {
+            var games = serverFacade.listGames(authToken);
+            var result = new StringBuilder();
+            for (int i = 0; i < games.size(); i++) {
+                var game = games.get(i);
+                int gameSpot = i + 1;
+                String white = (game.whiteUsername() == null) ? "---" : game.whiteUsername();
+                String black = (game.blackUsername() == null) ? "---" : game.blackUsername();
+                result.append("Game ")
+                        .append(gameSpot).append(": ")
+                        .append("GameName: ").append(game.gameName())
+                        .append(" White: ").append(white)
+                        .append(" Black: ").append(black)
+                        .append("\n");
+            }
+            return result.toString();
+        } catch (Exception ex) {
+            throw new Exception("List failed with " + ex.getMessage());
         }
-        return result.toString();
     }
 
     private String joinGame(String[] params) throws Exception {
@@ -176,9 +188,13 @@ public class ChessClient {
         if (params.length > 2) {
             return "Please only include the ID of the game and your desired color";
         }
-        Integer gameID = gameMap.get(Integer.valueOf(params[0]));
-        serverFacade.joinGame(gameID, params[1], authToken);
-        return String.format("Joined game %s", params[0]);
+        try {
+            Integer gameID = gameMap.get(Integer.valueOf(params[0]));
+            serverFacade.joinGame(gameID, params[1], authToken);
+            return String.format("Joined game %s", params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Join failed with " + ex.getMessage());
+        }
     }
 
     private String observeGame(String[] params) throws Exception {
@@ -189,17 +205,25 @@ public class ChessClient {
         if (params.length > 1) {
             return "Please only include the ID of the game you wish to observe";
         }
-        Integer listID = Integer.valueOf(params[0]);
-        return String.format("Observing game %s", params[0]);
+        try {
+            Integer listID = Integer.valueOf(params[0]);
+            return String.format("Observing game %s", params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Observe failed with " + ex.getMessage());
+        }
     }
 
     private String clearDb() throws Exception {
         assertSignedIn();
-        serverFacade.clearDb();
-        state = States.SIGNEDOUT;
-        gameMap.clear();
-        clientGameId = 1;
-        return "Database cleared";
+        try {
+            serverFacade.clearDb();
+            state = States.SIGNEDOUT;
+            gameMap.clear();
+            clientGameId = 1;
+            return "Database cleared";
+        } catch (Exception ex) {
+            throw new Exception("Clear failed with " + ex.getMessage());
+        }
     }
 
     private void assertSignedIn() throws Exception {
