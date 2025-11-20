@@ -59,7 +59,7 @@ public class ChessClient {
                 case "clear" -> clearDb();
                 default -> "";
             };
-        } catch (ResponseException ex) {
+        } catch (Exception ex) {
             return ex.getMessage();
         }
     }
@@ -96,50 +96,60 @@ public class ChessClient {
         help - to print possible commands""";
     }
 
-    private String login(String[] params) throws ResponseException {
+    private String login(String[] params) throws Exception {
+        assertSignedOut();
         if (params.length < 2) {
             return "Please enter both a username and password";
         } else if (params.length > 2) {
             return "Please only enter a username and password";
         }
-        authToken = serverFacade.login(params[0], params[1]).authToken();
-        state = States.SIGNEDIN;
-        return String.format("Logged in as %s", params[0]);
+        try {
+            authToken = serverFacade.login(params[0], params[1]).authToken();
+            state = States.SIGNEDIN;
+            return String.format("Logged in as %s", params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Login failed with " + ex.getMessage());
+        }
     }
 
-    private String register(String[] params) throws ResponseException {
+    private String register(String[] params) throws Exception {
+        assertSignedOut();
         if (params.length < 3) {
             return "Please enter username, password, and email";
         } else if (params.length > 3) {
             return "Please only enter username, password, and email";
         }
-        authToken = serverFacade.register(params[0], params[1], params[2]).authToken();
-        state = States.SIGNEDIN;
-        return String.format("Logged in as %s", params[0]);
+        try {
+            authToken = serverFacade.register(params[0], params[1], params[2]).authToken();
+            state = States.SIGNEDIN;
+            return String.format("Logged in as %s", params[0]);
+        } catch (Exception ex) {
+            throw new Exception("Register failed with " + ex.getMessage());
+        }
     }
 
-    private String logout() throws ResponseException {
+    private String logout() throws Exception {
         assertSignedIn();
         serverFacade.logout(authToken);
         state = States.SIGNEDOUT;
         return "Logged out";
     }
 
-    private String createGame(String[] params) throws ResponseException {
+    private String createGame(String[] params) throws Exception {
+        assertSignedIn();
         if (params.length == 0) {
             return "Please include a gameName";
         }
         if (params.length > 1) {
             return "Please only include a gameName";
         }
-        assertSignedIn();
         GameData gameData = serverFacade.createGame(params[0], authToken);
         gameMap.put(clientGameId, gameData.gameID());
         clientGameId++;
         return String.format("Created game %s", params[0]);
     }
 
-    private String listGames() throws ResponseException {
+    private String listGames() throws Exception {
         assertSignedIn();
         var games = serverFacade.listGames(authToken);
         var result = new StringBuilder();
@@ -158,32 +168,32 @@ public class ChessClient {
         return result.toString();
     }
 
-    private String joinGame(String[] params) throws ResponseException {
+    private String joinGame(String[] params) throws Exception {
+        assertSignedIn();
         if (params.length < 2) {
             return "Please include both the ID of the game and your desired color";
         }
         if (params.length > 2) {
             return "Please only include the ID of the game and your desired color";
         }
-        assertSignedIn();
         Integer gameID = gameMap.get(Integer.valueOf(params[0]));
         serverFacade.joinGame(gameID, params[1], authToken);
         return String.format("Joined game %s", params[0]);
     }
 
-    private String observeGame(String[] params) throws ResponseException {
+    private String observeGame(String[] params) throws Exception {
+        assertSignedIn();
         if (params.length == 0) {
             return "Please include the ID of the game you wish to observe";
         }
         if (params.length > 1) {
             return "Please only include the ID of the game you wish to observe";
         }
-        assertSignedIn();
         Integer listID = Integer.valueOf(params[0]);
         return String.format("Observing game %s", params[0]);
     }
 
-    private String clearDb() throws ResponseException {
+    private String clearDb() throws Exception {
         assertSignedIn();
         serverFacade.clearDb();
         state = States.SIGNEDOUT;
@@ -192,9 +202,15 @@ public class ChessClient {
         return "Database cleared";
     }
 
-    private void assertSignedIn() throws ResponseException {
+    private void assertSignedIn() throws Exception {
         if (state == States.SIGNEDOUT) {
-            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
+            throw new Exception("You must sign in");
+        }
+    }
+
+    private void assertSignedOut() throws Exception {
+        if (state == States.SIGNEDIN) {
+            throw new Exception("You're already signed in");
         }
     }
 }
