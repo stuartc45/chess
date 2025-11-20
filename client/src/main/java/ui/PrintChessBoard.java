@@ -30,7 +30,7 @@ public class PrintChessBoard {
                 } else {
                     boardString.append(SET_BG_COLOR_BLACK);
                 }
-                boardString.append(getPieceSymbol(board.getPiece(new ChessPosition(i+1, j+1))));
+                boardString.append(getPieceSymbol(board.getPiece(new ChessPosition(8-i, 8-j))));
             }
             boardString.append(SET_BG_COLOR_RED)
                     .append(" ")
