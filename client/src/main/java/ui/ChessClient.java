@@ -2,7 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import datamodel.*;
-import exception.ResponseException;
+import exception.ErrorResponse;
 import server.ServerFacade;
 
 import java.util.HashMap;
@@ -108,7 +108,8 @@ public class ChessClient {
             state = States.SIGNEDIN;
             return String.format("Logged in as %s", params[0]);
         } catch (Exception ex) {
-            throw new Exception("Login failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Login failed with " + errMessage);
         }
     }
 
@@ -124,7 +125,8 @@ public class ChessClient {
             state = States.SIGNEDIN;
             return String.format("Logged in as %s", params[0]);
         } catch (Exception ex) {
-            throw new Exception("Register failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Register failed with " + errMessage);
         }
     }
 
@@ -135,7 +137,8 @@ public class ChessClient {
             state = States.SIGNEDOUT;
             return "Logged out";
         } catch (Exception ex) {
-            throw new Exception("Logout failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Logout failed with " + errMessage);
         }
     }
 
@@ -153,7 +156,8 @@ public class ChessClient {
             clientGameId++;
             return String.format("Created game %s", params[0]);
         } catch (Exception ex) {
-            throw new Exception("Create failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Create failed with " + errMessage);
         }
     }
 
@@ -176,7 +180,8 @@ public class ChessClient {
             }
             return result.toString();
         } catch (Exception ex) {
-            throw new Exception("List failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("List failed with " + errMessage);
         }
     }
 
@@ -193,7 +198,8 @@ public class ChessClient {
             serverFacade.joinGame(gameID, params[1], authToken);
             return String.format("Joined game %s", params[0]);
         } catch (Exception ex) {
-            throw new Exception("Join failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Join failed with " + errMessage);
         }
     }
 
@@ -222,7 +228,8 @@ public class ChessClient {
             clientGameId = 1;
             return "Database cleared";
         } catch (Exception ex) {
-            throw new Exception("Clear failed with " + ex.getMessage());
+            String errMessage = getErrorMessage(ex);
+            throw new Exception("Clear failed with " + errMessage);
         }
     }
 
@@ -236,5 +243,10 @@ public class ChessClient {
         if (state == States.SIGNEDIN) {
             throw new Exception("You're already signed in");
         }
+    }
+
+    private String getErrorMessage(Exception ex) {
+        ErrorResponse err = new Gson().fromJson(ex.getMessage(), ErrorResponse.class);
+        return err.message;
     }
 }
