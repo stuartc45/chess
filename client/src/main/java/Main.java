@@ -6,7 +6,9 @@ import ui.PrintChessBoard;
 public class Main {
     public static void main(String[] args) {
         var printing = new PrintChessBoard("white");
-        printing.printBoard(new ChessBoard());
+        var board = new ChessBoard();
+        board.resetBoard();
+        printing.printBoard(board);
 //        if (args.length > 2) {
 //            new ChessClient("http://localhost:" + args[1]).run();
 //        } else {
