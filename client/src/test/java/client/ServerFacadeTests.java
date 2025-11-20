@@ -65,7 +65,16 @@ public class ServerFacadeTests {
         var authData = facade.register("player1", "password", "p1@email.com");
         var gameData = facade.createGame("game1", authData.authToken());
         System.out.println(gameData);
-        assertEquals("game1", gameData.gameName());
         assertTrue(gameData.gameID() != null);
+    }
+
+    @Test
+    void listGames() throws ResponseException {
+        var authToken = facade.register("joe", "joe", "joe").authToken();
+        var gameData1 = facade.createGame("game1", authToken);
+        var gameData2 = facade.createGame("game2", authToken);
+        var games = facade.listGames(authToken);
+        assertEquals(gameData1, games.get(0));
+        assertEquals(gameData2, games.get(1));
     }
 }

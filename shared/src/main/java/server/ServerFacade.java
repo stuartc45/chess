@@ -47,17 +47,22 @@ public class ServerFacade {
         return handleResponse(response, GameData.class);
     }
 
-    public void listGames(String authToken) {
-
+    public GameList listGames(String authToken) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, GameList.class);
     }
 
-    public void joinGame(String gameID, String color, String authToken) {
-
+    public void joinGame(Integer gameID, String color, String authToken) throws ResponseException {
+        JoinGameData joinGameReq = new JoinGameData(color, gameID);
+        var request = buildRequest("PUT", "/game", joinGameReq, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
-    public void observeGame(String gameID, String authToken) {
-
-    }
+//    public void observeGame(String gameID, String authToken) {
+//
+//    }
 
     public void clearDb() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
@@ -72,9 +77,6 @@ public class ServerFacade {
         if (authToken != null) {
             request.setHeader("authorization", authToken);
         }
-//        else {
-//            request.setHeader("Content-Type", "application/json");
-//        }
         return request.build();
     }
 

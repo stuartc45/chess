@@ -1,9 +1,11 @@
 package ui;
 
-import datamodel.GameData;
+import com.google.gson.Gson;
+import datamodel.*;
 import exception.ResponseException;
 import server.ServerFacade;
 
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Arrays;
 import static ui.EscapeSequences.*;
@@ -12,9 +14,12 @@ public class ChessClient {
     private final ServerFacade serverFacade;
     private States state = States.SIGNEDOUT;
     private String authToken;
+    private HashMap<Integer, Integer> gameMap;
+    private Integer clientGameId = 1;
 
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
+        gameMap = new HashMap<>();
     }
 
     public void run() {
@@ -113,18 +118,26 @@ public class ChessClient {
     private String createGame(String[] params) throws ResponseException {
         assertSignedIn();
         GameData gameData = serverFacade.createGame(params[0], authToken);
-        return String.format("Created game %s", gameData.gameName());
+        gameMap.put(clientGameId, gameData.gameID());
+        clientGameId++;
+        return String.format("Created game %s", params[0]);
     }
 
     private String listGames() throws ResponseException {
         assertSignedIn();
-        serverFacade.listGames(authToken);
-        return "fake list";
+        GameList gameList = serverFacade.listGames(authToken);
+        var result = new StringBuilder();
+        var gson = new Gson();
+        for (GameData game : gameList) {
+            result.append(gson.toJson(game)).append('\n');
+        }
+        return result.toString();
     }
 
     private String joinGame(String[] params) throws ResponseException {
         assertSignedIn();
-        serverFacade.joinGame(params[0], params[1], authToken);
+        Integer gameID = gameMap.get(Integer.valueOf(params[0]));
+        serverFacade.joinGame(gameID, params[1], authToken);
         return String.format("Joined game %s", params[0]);
     }
 
@@ -138,6 +151,8 @@ public class ChessClient {
         assertSignedIn();
         serverFacade.clearDb();
         state = States.SIGNEDOUT;
+        gameMap.clear();
+        clientGameId = 1;
         return "Database cleared";
     }
 
