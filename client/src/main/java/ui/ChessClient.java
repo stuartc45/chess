@@ -204,6 +204,8 @@ public class ChessClient {
             printChessBoard.printBoard(board);
             System.out.println(SET_TEXT_COLOR_GREEN);
             return String.format("Joined game %s", params[0]);
+        } catch (NumberFormatException e) {
+            throw new Exception("Please enter a numerical value");
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
             throw new Exception("Join failed with " + errMessage);
@@ -220,11 +222,16 @@ public class ChessClient {
         }
         try {
             Integer listID = Integer.valueOf(params[0]);
+            if (!gameMap.containsKey(listID)) {
+                throw new Exception("Enter a valid game ID");
+            }
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             PrintChessBoard printChessBoard = new PrintChessBoard("white");
             printChessBoard.printBoard(board);
             return String.format("Observing game %s", params[0]);
+        } catch (NumberFormatException e) {
+            throw new Exception("Please enter a numerical value");
         } catch (Exception ex) {
             throw new Exception("Observe failed with " + ex.getMessage());
         }
