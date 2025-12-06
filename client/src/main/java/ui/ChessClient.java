@@ -2,7 +2,6 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessMove;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
@@ -159,8 +158,8 @@ public class ChessClient {
         }
         try {
             GameData gameData = serverFacade.createGame(params[0], authToken);
-            gameMap.put(clientGameId, gameData.gameID());
-            clientGameId++;
+//            gameMap.put(clientGameId, gameData.gameID());
+//            clientGameId++;
             return String.format("Created game %s", params[0]);
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
@@ -201,8 +200,9 @@ public class ChessClient {
             return "Please only include the ID of the game and your desired color";
         }
         try {
-            Integer gameID = gameMap.get(Integer.valueOf(params[0]));
-            serverFacade.joinGame(gameID, params[1], authToken);
+//            Integer gameID = gameMap.get(Integer.valueOf(params[0]));
+//            serverFacade.joinGame(gameID, params[1], authToken);
+            serverFacade.joinGame(Integer.valueOf(params[0]), params[1], authToken);
             System.out.println(RESET_TEXT_COLOR);
             ChessBoard board = new ChessBoard();
             board.resetBoard();
@@ -252,7 +252,7 @@ public class ChessClient {
 
     private String redrawBoard() throws Exception {
         assertInGame();
-            
+        return null;
     }
 
     private String clearDb() throws Exception {
@@ -293,6 +293,6 @@ public class ChessClient {
     }
 
     private ChessMove makeChessMove(String pos) {
-
+        return null;
     }
 }
