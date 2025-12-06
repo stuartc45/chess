@@ -4,6 +4,7 @@ import dataaccess.*;
 import datamodel.*;
 import io.javalin.*;
 import io.javalin.http.Context;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.UserService;
 import com.google.gson.Gson;
@@ -24,6 +25,8 @@ public class Server {
             dataAccess = new MemoryDataAccess();
         }
 
+        WebSocketHandler webSocketHandler = new WebSocketHandler();
+
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));
@@ -36,6 +39,11 @@ public class Server {
         server.get("/game", this::listGames);
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
+        server.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler::connect);
+            ws.onClose(webSocketHandler::close);
+
+        });
     }
 
     private void clear(Context context) throws DataAccessException {

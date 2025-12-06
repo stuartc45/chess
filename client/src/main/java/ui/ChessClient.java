@@ -6,13 +6,15 @@ import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
 import serverfacade.ServerFacade;
+import ui.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Arrays;
 import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     private final ServerFacade serverFacade;
     private States state = States.SIGNEDOUT;
     private String authToken;
@@ -22,6 +24,10 @@ public class ChessClient {
     public ChessClient(String serverUrl) {
         this.serverFacade = new ServerFacade(serverUrl);
         gameMap = new HashMap<>();
+    }
+
+    public void notify(ServerMessage message) {
+        System.out.println(message.getServerMessageType());
     }
 
     public void run() {
