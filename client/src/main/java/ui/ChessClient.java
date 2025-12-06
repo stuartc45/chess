@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
@@ -58,6 +60,8 @@ public class ChessClient {
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
                 case "clear" -> clearDb();
+                case "showmoves" -> highlightMoves(params);
+                case "redraw" -> redrawBoard();
                 default -> "";
             };
         } catch (Exception ex) {
@@ -74,11 +78,13 @@ public class ChessClient {
     }
 
     private String help() {
-        if (state == States.SIGNEDOUT) {
+        if (state == States.GAMEPLAY) {
             return """
-                    register <USERNAME> <PASSWORD> <EMAIL> - create an account
-                    login <USERNAME> <PASSWORD> - log in
-                    quit - exit the program
+                    redraw - redraws the chess board
+                    leave - leaves the gameplay screen
+                    resign - forfeit and end the game
+                    move <POSITION> <POSITION> - make a chess move
+                    showmoves <POSITION> - shows the legal moves for a piece
                     help - print possible commands""";
         } else if (state == States.SIGNEDIN) {
             return """
@@ -237,6 +243,18 @@ public class ChessClient {
         }
     }
 
+    private String highlightMoves(String[] params) throws Exception {
+        assertInGame();
+        String pos = params[0];
+        return null;
+
+    }
+
+    private String redrawBoard() throws Exception {
+        assertInGame();
+            
+    }
+
     private String clearDb() throws Exception {
         assertSignedIn();
         try {
@@ -248,6 +266,12 @@ public class ChessClient {
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
             throw new Exception("Clear failed with " + errMessage);
+        }
+    }
+
+    private void assertInGame() throws Exception {
+        if (state != States.GAMEPLAY) {
+            throw new Exception("You must leave the game first");
         }
     }
 
@@ -266,5 +290,9 @@ public class ChessClient {
     private String getErrorMessage(Exception ex) {
         ErrorResponse err = new Gson().fromJson(ex.getMessage(), ErrorResponse.class);
         return err.message;
+    }
+
+    private ChessMove makeChessMove(String pos) {
+
     }
 }
