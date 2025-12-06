@@ -1,22 +1,53 @@
 package server.websocket;
 
-import io.javalin.websocket.WsCloseContext;
-import io.javalin.websocket.WsConnectContext;
+import com.google.gson.Gson;
+import dataaccess.DataAccessException;
+import dataaccess.SqlDataAccess;
+import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.commands.UserGameCommand;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.io.IOException;
 
-public class WebSocketHandler {
+public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Connections connections = new Connections();
 
-    public void connect(WsConnectContext ctx) {
-        connections.add(ctx);
+    @Override
+    public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
+        ctx.enableAutomaticPings();
     }
 
-    public void close(WsCloseContext ctx) {
-        connections.remove(ctx);
+    @Override
+    public void handleMessage(WsMessageContext ctx) {
+        try {
+            UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
+            switch (command.getCommandType()) {
+                case CONNECT -> join(command.getAuthToken(), command.getGameID(), ctx.session);
+                case LEAVE -> leave(command.getAuthToken(), command.getGameID(), ctx.session);
+            }
+        } catch (Exception ex) {
+
+        }
+    }
+
+    @Override
+    public void handleClose(WsCloseContext ctx) {
         System.out.println("Websocket closed");
+    }
+
+    private void join(String authToken, Integer gameID, Session session) {
+        try {
+            connections.connect(session);
+            String userName = new SqlDataAccess().getAuth(authToken).username();
+
+        } catch (DataAccessException ex) {
+
+        }
+
+    }
+
+    private void leave(String authToken, Integer gameID, Session session) {
+
     }
 }
