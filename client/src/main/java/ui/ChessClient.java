@@ -7,6 +7,7 @@ import datamodel.*;
 import exception.ErrorResponse;
 import serverfacade.ServerFacade;
 import ui.websocket.NotificationHandler;
+import ui.websocket.WebSocketFacade;
 import websocket.messages.ServerMessage;
 
 import java.util.HashMap;
@@ -18,12 +19,14 @@ public class ChessClient implements NotificationHandler {
     private final ServerFacade serverFacade;
     private States state = States.SIGNEDOUT;
     private String authToken;
+    private final WebSocketFacade ws;
     private HashMap<Integer, Integer> gameMap;
     private Integer clientGameId = 1;
 
-    public ChessClient(String serverUrl) {
+    public ChessClient(String serverUrl) throws Exception {
         this.serverFacade = new ServerFacade(serverUrl);
         gameMap = new HashMap<>();
+        ws = new WebSocketFacade(serverUrl, this);
     }
 
     public void notify(ServerMessage message) {
@@ -208,13 +211,16 @@ public class ChessClient implements NotificationHandler {
         try {
 //            Integer gameID = gameMap.get(Integer.valueOf(params[0]));
 //            serverFacade.joinGame(gameID, params[1], authToken);
-            serverFacade.joinGame(Integer.valueOf(params[0]), params[1], authToken);
+            Integer gameID = Integer.valueOf(params[0]);
+            serverFacade.joinGame(gameID, params[1], authToken);
+            ws.joinGame(authToken, gameID);
             System.out.println(RESET_TEXT_COLOR);
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             PrintChessBoard printChessBoard = new PrintChessBoard(params[1]);
             printChessBoard.printBoard(board);
             System.out.println(SET_TEXT_COLOR_GREEN);
+            ws.leaveGame(authToken, gameID);
             return String.format("Joined game %s", params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Please enter a numerical value");

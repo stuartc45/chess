@@ -25,6 +25,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             switch (command.getCommandType()) {
                 case CONNECT -> join(command.getAuthToken(), command.getGameID(), ctx.session);
                 case LEAVE -> leave(command.getAuthToken(), command.getGameID(), ctx.session);
+                case RESIGN -> resign(command.getAuthToken(), command.getGameID(), ctx.session);
             }
         } catch (Exception ex) {
 
@@ -48,6 +49,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void leave(String authToken, Integer gameID, Session session) {
+        try {
+            connections.close(session);
+            String userName = new SqlDataAccess().getAuth(authToken).username();
+
+        } catch (DataAccessException ex) {
+
+        }
+    }
+
+    private void resign(String authToken, Integer gameID, Session session) {
 
     }
 }
