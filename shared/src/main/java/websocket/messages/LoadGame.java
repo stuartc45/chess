@@ -1,6 +1,4 @@
-package websocket.commands;
-
-import websocket.messages.ServerMessage;
+package websocket.messages;
 
 public class LoadGame extends ServerMessage {
     private final String game = "temporary string";
