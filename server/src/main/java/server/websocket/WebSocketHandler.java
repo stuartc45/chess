@@ -6,6 +6,7 @@ import dataaccess.SqlDataAccess;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.Notification;
 
 import java.io.IOException;
 
@@ -28,7 +29,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case RESIGN -> resign(command.getAuthToken(), command.getGameID(), ctx.session);
             }
         } catch (Exception ex) {
-
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -41,8 +42,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             connections.connect(session);
             String userName = new SqlDataAccess().getAuth(authToken).username();
-
+            connections.sendNotification(session, new Notification(userName + "has joined the game"));
         } catch (DataAccessException ex) {
+
+        } catch (IOException ex) {
 
         }
 

@@ -220,7 +220,7 @@ public class ChessClient implements NotificationHandler {
             PrintChessBoard printChessBoard = new PrintChessBoard(params[1]);
             printChessBoard.printBoard(board);
             System.out.println(SET_TEXT_COLOR_GREEN);
-            ws.leaveGame(authToken, gameID);
+//            ws.leaveGame(authToken, gameID);
             return String.format("Joined game %s", params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Please enter a numerical value");
