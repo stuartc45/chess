@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import datamodel.*;
 
 import java.sql.SQLException;
@@ -16,4 +17,5 @@ public interface DataAccess {
     GameData getGame(Integer gameID) throws DataAccessException;
     void updateGame(Integer gameID, String whiteUsername, String blackUsername, String gameName) throws DataAccessException;
     List<GameData> getGameList() throws DataAccessException, SQLException;
+    void updateGameState(Integer gameID, ChessGame game) throws DataAccessException;
 }

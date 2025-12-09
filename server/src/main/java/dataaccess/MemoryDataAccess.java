@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import datamodel.AuthData;
 import datamodel.GameData;
 import datamodel.UserData;
@@ -61,5 +62,9 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public List<GameData> getGameList() {
         return new ArrayList<>(games.values());
+    }
+
+    @Override
+    public void updateGameState(Integer gameID, ChessGame game) {
     }
 }

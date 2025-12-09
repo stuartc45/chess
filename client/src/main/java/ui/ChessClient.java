@@ -96,6 +96,7 @@ public class ChessClient implements NotificationHandler {
                 case "redraw" -> redrawBoard();
                 case "move" -> makeChessMove(params);
                 case "leave" -> leaveGame();
+                case "resign" -> resign();
                 default -> "";
             };
         } catch (Exception ex) {
@@ -303,6 +304,10 @@ public class ChessClient implements NotificationHandler {
     private String makeChessMove(String[] params) {
         String moveFrom = params[0];
         String moveTo = params[1];
+        return null;
+    }
+
+    private String resign() {
         return null;
     }
 

@@ -34,14 +34,14 @@ public class Connections {
         }
     }
 
-    public void sendError(WsMessageContext ctx, Error message) throws IOException {
+    public void sendError(WsMessageContext ctx, Error message) {
         String msg = message.getJson();
         if (connections.containsKey(ctx) && ctx.session.isOpen()) {
             ctx.send(msg);
         }
     }
 
-    public void sendGame(WsMessageContext ctx, Integer gameID, LoadGame message) throws IOException {
+    public void sendGame(WsMessageContext ctx, Integer gameID, LoadGame message) {
         String msg = message.getJson();
         for (var c : connections.entrySet()) {
             if (c.getValue().equals(gameID)) {

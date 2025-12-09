@@ -125,6 +125,12 @@ public class SqlDataAccess implements DataAccess {
     }
 
     @Override
+    public void updateGameState(Integer gameID, ChessGame game) throws DataAccessException {
+        var statement = "UPDATE game_data SET game = ? WHERE gameID = ?;";
+        executeUpdate(statement, game, gameID);
+    }
+
+    @Override
     public List<GameData> getGameList() throws DataAccessException, SQLException {
         var statement = "SELECT * FROM game_data;";
         List<GameData> gameList = new ArrayList<>();

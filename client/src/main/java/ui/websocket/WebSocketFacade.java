@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Error;
 import websocket.messages.LoadGame;
@@ -53,6 +55,15 @@ public class WebSocketFacade extends Endpoint {
     public void leaveGame(String authToken, Integer gameID) {
         try {
             UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
+            this.session.getBasicRemote().sendText(gson.toJson(command));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public void makeMove(String authToken, Integer gameID, ChessMove chessMove) {
+        try {
+            MakeMoveCommand command = new MakeMoveCommand(authToken, gameID, chessMove);
             this.session.getBasicRemote().sendText(gson.toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
