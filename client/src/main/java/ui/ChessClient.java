@@ -33,7 +33,6 @@ public class ChessClient implements NotificationHandler {
     }
 
     public void notify(ServerMessage message) {
-        System.out.println(message.getServerMessageType());
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> {
                 var msg = (websocket.messages.Notification) message;

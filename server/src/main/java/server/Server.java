@@ -42,9 +42,9 @@ public class Server {
         server.post("/game", this::createGame);
         server.put("/game", this::joinGame);
         server.ws("/ws", ws -> {
-            ws.onConnect(webSocketHandler);
-            ws.onClose(webSocketHandler);
-            ws.onMessage(webSocketHandler);
+            ws.onConnect(webSocketHandler::handleConnect);
+            ws.onClose(webSocketHandler::handleClose);
+            ws.onMessage(webSocketHandler::handleMessage);
         });
     }
 

@@ -10,42 +10,39 @@ import websocket.messages.Notification;
 
 import java.io.IOException;
 
-public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
+public class WebSocketHandler {
     private final Connections connections = new Connections();
 
     public WebSocketHandler() {
     }
 
-    @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
         ctx.enableAutomaticPings();
     }
 
-    @Override
+    public void handleClose(WsCloseContext ctx) {
+        System.out.println("Websocket closed");
+    }
+
     public void handleMessage(WsMessageContext ctx) {
         try {
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             switch (command.getCommandType()) {
-                case CONNECT -> join(command.getAuthToken(), command.getGameID(), ctx.session);
-                case LEAVE -> leave(command.getAuthToken(), command.getGameID(), ctx.session);
-                case RESIGN -> resign(command.getAuthToken(), command.getGameID(), ctx.session);
+                case CONNECT -> join(command.getAuthToken(), command.getGameID(), ctx);
+                case LEAVE -> leave(command.getAuthToken(), command.getGameID(), ctx);
+                case RESIGN -> resign(command.getAuthToken(), command.getGameID(), ctx);
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
     }
 
-    @Override
-    public void handleClose(WsCloseContext ctx) {
-        System.out.println("Websocket closed");
-    }
-
-    private void join(String authToken, Integer gameID, Session session) {
+    private void join(String authToken, Integer gameID, WsMessageContext ctx) {
         try {
-            connections.connect(gameID, session);
+            connections.connect(gameID, ctx);
             String userName = new SqlDataAccess().getAuth(authToken).username();
-            connections.sendNotification(session, gameID, new Notification(userName + " has joined the game"));
+            connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game"));
         } catch (DataAccessException ex) {
 
         } catch (IOException ex) {
@@ -54,11 +51,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     }
 
-    private void leave(String authToken, Integer gameID, Session session) {
+    private void leave(String authToken, Integer gameID, WsMessageContext ctx) {
         try {
-            connections.close(session);
+            connections.close(ctx);
             String userName = new SqlDataAccess().getAuth(authToken).username();
-            connections.sendNotification(session, gameID, new Notification(userName + " has left the game"));
+            connections.sendNotification(ctx, gameID, new Notification(userName + " has left the game"));
+
 
         } catch (DataAccessException ex) {
 
@@ -67,7 +65,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void resign(String authToken, Integer gameID, Session session) {
+    private void resign(String authToken, Integer gameID, WsMessageContext ctx) {
 
     }
 }
