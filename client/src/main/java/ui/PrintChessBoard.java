@@ -19,7 +19,7 @@ public class PrintChessBoard {
         Boolean isWhite = color.equalsIgnoreCase("white");
         var boardString = new StringBuilder();
         String letters = isWhite ? "    a   b   c  d   e  f   g   h    " : "    h   g   f  e   d  c   b   a    ";
-        boardString.append(SET_BG_COLOR_RED)
+        boardString.append(SET_BG_COLOR_RED).append(SET_TEXT_COLOR_WHITE)
                 .append(letters)
                 .append(RESET_BG_COLOR)
                 .append("\n");

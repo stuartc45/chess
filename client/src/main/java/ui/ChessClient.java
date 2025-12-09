@@ -295,8 +295,9 @@ public class ChessClient implements NotificationHandler {
 
     private String redrawBoard() throws Exception {
         assertInGame();
-
-        return null;
+        PrintChessBoard printer = new PrintChessBoard(currentColor);
+        printer.printBoard(currentGame.getBoard());
+        return "";
     }
 
     private String makeChessMove(String[] params) {
