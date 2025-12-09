@@ -10,39 +10,43 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Connections {
-    public final ConcurrentHashMap<Session, Session> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Session, Integer> connections = new ConcurrentHashMap<>();
 
-    public void connect(Session session) {
-        connections.put(session, session);
+    public void connect(Integer gameID, Session session) {
+        connections.put(session, gameID);
     }
 
     public void close(Session session) {
         connections.remove(session);
     }
 
-    public void sendNotification(Session session, Notification message) throws IOException {
-        String msg = message.getMessage();
-        for (Session c : connections.values()) {
-            if (c.isOpen()) {
-                if (!c.equals(session)) {
-                    c.getRemote().sendString(msg);
+    public void sendNotification(Session session, Integer gameID, Notification message) throws IOException {
+        String msg = message.getJson();
+        for (var c : connections.entrySet()) {
+            if (c.getValue().equals(gameID)) {
+                if (c.getKey().isOpen()) {
+                    if (!c.getKey().equals(session)) {
+                        c.getKey().getRemote().sendString(msg);
+                    }
                 }
             }
         }
     }
 
     public void sendError(Session session, Error message) throws IOException {
-        String msg = message.getMessage();
+        String msg = message.getJson();
         if (connections.contains(session) && session.isOpen()) {
             session.getRemote().sendString(msg);
         }
     }
 
-    public void sendGame(Session session, LoadGame game) throws IOException {
-        String msg = game.getMessage();
-        for (Session c : connections.values()) {
-            if (c.isOpen()) {
-                c.getRemote().sendString(msg);
+    public void sendGame(Session session, Integer gameID, LoadGame message) throws IOException {
+        String msg = message.getJson();
+        for (var c : connections.entrySet()) {
+            if (c.getValue().equals(gameID)) {
+                if (c.getKey().isOpen()) {
+                    c.getKey().getRemote().sendString(msg);
+                }
             }
         }
     }

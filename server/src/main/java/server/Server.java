@@ -27,6 +27,8 @@ public class Server {
 
         WebSocketHandler webSocketHandler = new WebSocketHandler();
 
+
+
         userService = new UserService(dataAccess);
         gameService = new GameService(dataAccess);
         server = Javalin.create(config -> config.staticFiles.add("web"));

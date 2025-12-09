@@ -7,6 +7,9 @@ import java.net.URISyntaxException;
 import com.google.gson.Gson;
 import jakarta.websocket.*;
 import websocket.commands.UserGameCommand;
+import websocket.messages.Error;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
 
 public class WebSocketFacade extends Endpoint {
@@ -25,8 +28,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(serverMessage);
+                    handleMessage(message);
                 }
             });
         } catch (DeploymentException | URISyntaxException | IOException ex) {
@@ -54,6 +56,24 @@ public class WebSocketFacade extends Endpoint {
             this.session.getBasicRemote().sendText(gson.toJson(command));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public void resignGame(String authToken, Integer gameID) {
+        try {
+            UserGameCommand command = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(gson.toJson(command));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private void handleMessage(String message) {
+        ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+        switch (serverMessage.getServerMessageType()) {
+            case NOTIFICATION -> notificationHandler.notify(gson.fromJson(message, Notification.class));
+            case ERROR -> notificationHandler.notify(gson.fromJson(message, Error.class));
+            case LOAD_GAME -> notificationHandler.notify(gson.fromJson(message, LoadGame.class));
         }
     }
 }

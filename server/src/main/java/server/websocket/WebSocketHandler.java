@@ -13,6 +13,9 @@ import java.io.IOException;
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
     private final Connections connections = new Connections();
 
+    public WebSocketHandler() {
+    }
+
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
@@ -40,9 +43,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void join(String authToken, Integer gameID, Session session) {
         try {
-            connections.connect(session);
+            connections.connect(gameID, session);
             String userName = new SqlDataAccess().getAuth(authToken).username();
-            connections.sendNotification(session, new Notification(userName + "has joined the game"));
+            connections.sendNotification(session, gameID, new Notification(userName + " has joined the game"));
         } catch (DataAccessException ex) {
 
         } catch (IOException ex) {
@@ -55,8 +58,11 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         try {
             connections.close(session);
             String userName = new SqlDataAccess().getAuth(authToken).username();
+            connections.sendNotification(session, gameID, new Notification(userName + " has left the game"));
 
         } catch (DataAccessException ex) {
+
+        } catch (IOException ex) {
 
         }
     }

@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import datamodel.*;
@@ -20,17 +21,33 @@ public class ChessClient implements NotificationHandler {
     private States state = States.SIGNEDOUT;
     private String authToken;
     private final WebSocketFacade ws;
-    private HashMap<Integer, Integer> gameMap;
-    private Integer clientGameId = 1;
+//    private HashMap<Integer, Integer> gameMap;
+//    private Integer clientGameId = 1;
+    private ChessGame currentGame = null;
+    private Integer currentGameID = null;
 
     public ChessClient(String serverUrl) throws Exception {
         this.serverFacade = new ServerFacade(serverUrl);
-        gameMap = new HashMap<>();
+//        gameMap = new HashMap<>();
         ws = new WebSocketFacade(serverUrl, this);
     }
 
     public void notify(ServerMessage message) {
         System.out.println(message.getServerMessageType());
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> {
+                var msg = (websocket.messages.Notification) message;
+                System.out.println(msg.getMessage());
+            }
+            case ERROR -> {
+                var msg = (websocket.messages.Error) message;
+                System.out.println(msg.getMessage());
+            }
+            case LOAD_GAME -> {
+                var msg = (websocket.messages.LoadGame) message;
+                ChessGame updatedGame = msg.getGame();
+            }
+        }
     }
 
     public void run() {
@@ -70,6 +87,8 @@ public class ChessClient implements NotificationHandler {
                 case "clear" -> clearDb();
                 case "showmoves" -> highlightMoves(params);
                 case "redraw" -> redrawBoard();
+                case "move" -> makeChessMove(params);
+                case "leave" -> leaveGame();
                 default -> "";
             };
         } catch (Exception ex) {
@@ -89,7 +108,7 @@ public class ChessClient implements NotificationHandler {
         if (state == States.GAMEPLAY) {
             return """
                     redraw - redraws the chess board
-                    leave - leaves the gameplay screen
+                    leave - leaves the game
                     resign - forfeit and end the game
                     move <POSITION> <POSITION> - make a chess move
                     showmoves <POSITION> - shows the legal moves for a piece
@@ -167,8 +186,7 @@ public class ChessClient implements NotificationHandler {
         }
         try {
             GameData gameData = serverFacade.createGame(params[0], authToken);
-//            gameMap.put(clientGameId, gameData.gameID());
-//            clientGameId++;
+
             return String.format("Created game %s", params[0]);
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
@@ -209,18 +227,16 @@ public class ChessClient implements NotificationHandler {
             return "Please only include the ID of the game and your desired color";
         }
         try {
-//            Integer gameID = gameMap.get(Integer.valueOf(params[0]));
-//            serverFacade.joinGame(gameID, params[1], authToken);
-            Integer gameID = Integer.valueOf(params[0]);
-            serverFacade.joinGame(gameID, params[1], authToken);
-            ws.joinGame(authToken, gameID);
+            state = States.GAMEPLAY;
+            currentGameID = Integer.valueOf(params[0]);
+            serverFacade.joinGame(currentGameID, params[1], authToken);
+            ws.joinGame(authToken, currentGameID);
             System.out.println(RESET_TEXT_COLOR);
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             PrintChessBoard printChessBoard = new PrintChessBoard(params[1]);
             printChessBoard.printBoard(board);
             System.out.println(SET_TEXT_COLOR_GREEN);
-//            ws.leaveGame(authToken, gameID);
             return String.format("Joined game %s", params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Please enter a numerical value");
@@ -240,9 +256,10 @@ public class ChessClient implements NotificationHandler {
         }
         try {
             Integer listID = Integer.valueOf(params[0]);
-            if (!gameMap.containsKey(listID)) {
-                throw new Exception("Enter a valid game ID");
-            }
+//            if (!gameMap.containsKey(listID)) {
+//                throw new Exception("Enter a valid game ID");
+//            }
+            // you're going to need something that checks for this ^^^
             ChessBoard board = new ChessBoard();
             board.resetBoard();
             PrintChessBoard printChessBoard = new PrintChessBoard("white");
@@ -255,6 +272,13 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
+    private String leaveGame() throws Exception {
+        assertInGame();
+        ws.leaveGame(authToken, currentGameID);
+        state = States.SIGNEDIN;
+        return "You have left the game";
+    }
+
     private String highlightMoves(String[] params) throws Exception {
         assertInGame();
         String pos = params[0];
@@ -264,6 +288,13 @@ public class ChessClient implements NotificationHandler {
 
     private String redrawBoard() throws Exception {
         assertInGame();
+
+        return null;
+    }
+
+    private String makeChessMove(String[] params) {
+        String moveFrom = params[0];
+        String moveTo = params[1];
         return null;
     }
 
@@ -272,8 +303,8 @@ public class ChessClient implements NotificationHandler {
         try {
             serverFacade.clearDb();
             state = States.SIGNEDOUT;
-            gameMap.clear();
-            clientGameId = 1;
+//            gameMap.clear();
+//            clientGameId = 1;
             return "Database cleared";
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
@@ -282,19 +313,25 @@ public class ChessClient implements NotificationHandler {
     }
 
     private void assertInGame() throws Exception {
-        if (state != States.GAMEPLAY) {
-            throw new Exception("You must leave the game first");
+        if (state == States.SIGNEDIN) {
+            throw new Exception("You must join a game first");
+        } else if (state == States.SIGNEDOUT) {
+            throw new Exception("You must sign in");
         }
     }
 
     private void assertSignedIn() throws Exception {
         if (state == States.SIGNEDOUT) {
             throw new Exception("You must sign in");
+        } else if (state == States.GAMEPLAY) {
+            throw new Exception("You must leave the game first");
         }
     }
 
     private void assertSignedOut() throws Exception {
         if (state == States.SIGNEDIN) {
+            throw new Exception("You're already signed in");
+        } else if (state == States.GAMEPLAY) {
             throw new Exception("You're already signed in");
         }
     }
@@ -302,9 +339,5 @@ public class ChessClient implements NotificationHandler {
     private String getErrorMessage(Exception ex) {
         ErrorResponse err = new Gson().fromJson(ex.getMessage(), ErrorResponse.class);
         return err.message;
-    }
-
-    private ChessMove makeChessMove(String pos) {
-        return null;
     }
 }

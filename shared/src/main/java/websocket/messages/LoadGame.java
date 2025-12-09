@@ -1,13 +1,21 @@
 package websocket.messages;
 
-public class LoadGame extends ServerMessage {
-    private final String game = "temporary string";
+import chess.ChessGame;
+import com.google.gson.Gson;
 
-    public LoadGame() {
+public class LoadGame extends ServerMessage {
+    private final ChessGame game;
+
+    public LoadGame(ChessGame game) {
         super(ServerMessageType.LOAD_GAME);
+        this.game = game;
     }
 
-    public String getMessage() {
+    public String getJson() {
+        return new Gson().toJson(this);
+    }
+
+    public ChessGame getGame() {
         return game;
     }
 }
