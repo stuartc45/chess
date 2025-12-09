@@ -8,7 +8,9 @@ import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
 import websocket.messages.Error;
+import websocket.messages.LoadGame;
 import websocket.messages.Notification;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 
@@ -45,7 +47,10 @@ public class WebSocketHandler {
     private void join(String authToken, Integer gameID, WsMessageContext ctx) {
         try {
             connections.connect(gameID, ctx);
-            String userName = new SqlDataAccess().getAuth(authToken).username();
+            var game = db.getGame(gameID).game();
+            ServerMessage message = new LoadGame(game);
+            ctx.send(new Gson().toJson(message));
+            String userName = db.getAuth(authToken).username();
             connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game"));
         } catch (DataAccessException ex) {
 
@@ -60,9 +65,9 @@ public class WebSocketHandler {
             connections.close(ctx);
             String userName = db.getAuth(authToken).username();
             var game = db.getGame(gameID);
-            if (game.whiteUsername().equalsIgnoreCase(userName)) {
+            if (userName.equalsIgnoreCase(game.whiteUsername())) {
                 db.updateGame(gameID, null, game.blackUsername(), game.gameName());
-            } else if (game.blackUsername().equalsIgnoreCase(userName)) {
+            } else if (userName.equalsIgnoreCase(game.blackUsername())) {
                 db.updateGame(gameID, game.whiteUsername(), null, game.gameName());
             } else {
                 connections.sendError(ctx, new Error("Error leaving the game"));

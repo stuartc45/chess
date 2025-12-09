@@ -25,6 +25,7 @@ public class ChessClient implements NotificationHandler {
 //    private Integer clientGameId = 1;
     private ChessGame currentGame = null;
     private Integer currentGameID = null;
+    private String currentColor = null;
 
     public ChessClient(String serverUrl) throws Exception {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -37,14 +38,21 @@ public class ChessClient implements NotificationHandler {
             case NOTIFICATION -> {
                 var msg = (websocket.messages.Notification) message;
                 System.out.println(msg.getMessage());
+                printPrompt();
             }
             case ERROR -> {
                 var msg = (websocket.messages.Error) message;
                 System.out.println(msg.getMessage());
+                printPrompt();
             }
             case LOAD_GAME -> {
                 var msg = (websocket.messages.LoadGame) message;
-                ChessGame updatedGame = msg.getGame();
+                currentGame = msg.getGame();
+                System.out.println(RESET_TEXT_COLOR);
+                PrintChessBoard printer = new PrintChessBoard(currentColor);
+                printer.printBoard(currentGame.getBoard());
+                System.out.println(SET_TEXT_COLOR_GREEN);
+                printPrompt();
             }
         }
     }
@@ -229,14 +237,12 @@ public class ChessClient implements NotificationHandler {
         }
         try {
             state = States.GAMEPLAY;
-            currentGameID = Integer.valueOf(params[0]);
-            serverFacade.joinGame(currentGameID, params[1], authToken);
-            ws.joinGame(authToken, currentGameID);
+            Integer gameID = Integer.valueOf(params[0]);
+            serverFacade.joinGame(gameID, params[1], authToken);
+            currentGameID = gameID;
+            currentColor = params[1];
+            ws.joinGame(authToken, gameID);
             System.out.println(RESET_TEXT_COLOR);
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-            PrintChessBoard printChessBoard = new PrintChessBoard(params[1]);
-            printChessBoard.printBoard(board);
             System.out.println(SET_TEXT_COLOR_GREEN);
             return String.format("Joined game %s", params[0]);
         } catch (NumberFormatException e) {
