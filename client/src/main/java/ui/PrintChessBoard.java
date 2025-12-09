@@ -1,9 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
@@ -47,6 +48,54 @@ public class PrintChessBoard {
                 .append(letters)
                 .append(RESET_BG_COLOR);
         System.out.println(boardString.toString());
+     }
+
+     public void printHighlightBoard(ChessGame game, ChessPosition position) {
+         ChessBoard board = game.getBoard();
+         Collection<ChessMove> validMoves = game.validMoves(position);
+         Set<ChessPosition> highlightSquares = new HashSet<>();
+         for (var move : validMoves) {
+             highlightSquares.add(move.getEndPosition());
+         }
+         highlightSquares.add(position);
+         boolean isWhite;
+         isWhite = color == ChessGame.TeamColor.WHITE;
+         var boardString = new StringBuilder();
+         String letters = isWhite ? "    a   b   c  d   e  f   g   h    " : "    h   g   f  e   d  c   b   a    ";
+         boardString.append(SET_BG_COLOR_RED).append(SET_TEXT_COLOR_WHITE)
+                 .append(letters)
+                 .append(RESET_BG_COLOR)
+                 .append("\n");
+         for (int i = 0; i < 8; i++) {
+             int rowNum = isWhite ? 8 - i : i + 1;
+             boardString.append(SET_BG_COLOR_RED).append(" ").append(rowNum).append(" ");
+
+             for (int j = 0; j < 8; j++) {
+                 int colNum = isWhite ? j + 1 : 8 - j;
+                 ChessPosition square = new ChessPosition(rowNum, colNum);
+
+                 boolean highlight = highlightSquares.contains(square);
+
+                 if (highlight) {
+                     boardString.append(SET_BG_COLOR_BLUE);
+                 } else if ((i + j) % 2 == 0) {
+                     boardString.append(SET_BG_COLOR_LIGHT_GREY);
+                 } else {
+                     boardString.append(SET_BG_COLOR_BLACK);
+                 }
+
+                 boardString.append(getPieceSymbol(board.getPiece(square)));
+             }
+
+             boardString.append(SET_BG_COLOR_RED)
+                     .append(" ").append(rowNum).append(" ")
+                     .append(RESET_BG_COLOR)
+                     .append("\n");
+         }
+         boardString.append(SET_BG_COLOR_RED)
+                 .append(letters)
+                 .append(RESET_BG_COLOR);
+         System.out.println(boardString.toString());
      }
 
      private String getPieceSymbol(ChessPiece piece) {

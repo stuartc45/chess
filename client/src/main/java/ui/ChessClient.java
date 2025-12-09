@@ -292,9 +292,13 @@ public class ChessClient implements NotificationHandler {
 
     private String highlightMoves(String[] params) throws Exception {
         assertInGame();
-        String pos = params[0];
-        return null;
-
+        if (params.length > 1) {
+            throw new Exception("Only include one position to highlight");
+        }
+        ChessPosition position = parseSquare(params[0]);
+        PrintChessBoard printer = new PrintChessBoard(currentColor);
+        printer.printHighlightBoard(currentGame, position);
+        return "";
     }
 
     private String redrawBoard() throws Exception {
