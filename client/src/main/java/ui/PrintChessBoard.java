@@ -9,14 +9,15 @@ import static ui.EscapeSequences.*;
 
 
 public class PrintChessBoard {
-    private final String color;
+    private final ChessGame.TeamColor color;
 
-    public PrintChessBoard(String color) {
+    public PrintChessBoard(ChessGame.TeamColor color) {
         this.color = color;
     }
 
      public void printBoard(ChessBoard board) {
-        Boolean isWhite = color.equalsIgnoreCase("white");
+        boolean isWhite;
+        isWhite = color == ChessGame.TeamColor.WHITE;
         var boardString = new StringBuilder();
         String letters = isWhite ? "    a   b   c  d   e  f   g   h    " : "    h   g   f  e   d  c   b   a    ";
         boardString.append(SET_BG_COLOR_RED).append(SET_TEXT_COLOR_WHITE)

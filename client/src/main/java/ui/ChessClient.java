@@ -1,8 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
+import chess.*;
 import com.google.gson.Gson;
 import datamodel.*;
 import exception.ErrorResponse;
@@ -25,7 +23,7 @@ public class ChessClient implements NotificationHandler {
 //    private Integer clientGameId = 1;
     private ChessGame currentGame = null;
     private Integer currentGameID = null;
-    private String currentColor = null;
+    private ChessGame.TeamColor currentColor;
 
     public ChessClient(String serverUrl) throws Exception {
         this.serverFacade = new ServerFacade(serverUrl);
@@ -237,11 +235,16 @@ public class ChessClient implements NotificationHandler {
             return "Please only include the ID of the game and your desired color";
         }
         try {
-            state = States.GAMEPLAY;
+
             Integer gameID = Integer.valueOf(params[0]);
             serverFacade.joinGame(gameID, params[1], authToken);
+            state = States.GAMEPLAY;
             currentGameID = gameID;
-            currentColor = params[1];
+            if (params[1].equalsIgnoreCase("white")) {
+                currentColor = ChessGame.TeamColor.WHITE;
+            } else {
+                currentColor = ChessGame.TeamColor.BLACK;
+            }
             ws.joinGame(authToken, gameID);
             System.out.println(RESET_TEXT_COLOR);
             System.out.println(SET_TEXT_COLOR_GREEN);
@@ -270,8 +273,8 @@ public class ChessClient implements NotificationHandler {
             // you're going to need something that checks for this ^^^
             ChessBoard board = new ChessBoard();
             board.resetBoard();
-            PrintChessBoard printChessBoard = new PrintChessBoard("white");
-            printChessBoard.printBoard(board);
+//            PrintChessBoard printChessBoard = new PrintChessBoard("white");
+//            printChessBoard.printBoard(board);
             return String.format("Observing game %s", params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Please enter a numerical value");
@@ -301,10 +304,87 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
-    private String makeChessMove(String[] params) {
-        String moveFrom = params[0];
-        String moveTo = params[1];
-        return null;
+    private String makeChessMove(String[] params) throws Exception {
+        if (params.length > 2) {
+            throw new Exception("Only include the start and end positions of the piece you want to move");
+        }
+        if (params.length < 2) {
+            throw new Exception("Please include both the start and end positions of the piece you want to move");
+        }
+        try {
+            ChessPosition moveFrom = parseSquare(params[0]);
+            ChessPosition moveTo = parseSquare(params[1]);
+            boolean promotion;
+            promotion = checkPromotion(moveFrom, moveTo);
+            ChessPiece.PieceType promotionPiece = null;
+            if (promotion) {
+                promotionPiece = getPromotionPiece();
+            }
+            ChessMove move = new ChessMove(moveFrom, moveTo, promotionPiece);
+            ws.makeMove(authToken, currentGameID, move);
+            return "";
+        } catch (Exception ex) {
+            throw new Exception("Make move not valid");
+        }
+    }
+
+    private ChessPosition parseSquare(String square) throws Exception {
+        if (square == null || square.length() != 2) {
+            throw new Exception("Incorrect position. Expected positions examples: a2, h7, etc.");
+        }
+
+        char colLetter = Character.toLowerCase(square.charAt(0));
+        char rowNum = square.charAt(1);
+        if (colLetter < 'a' || colLetter > 'h') {
+            throw new Exception("Column must be a–h");
+        }
+        if (rowNum < '1' || rowNum > '8') {
+            throw new Exception("Row must be 1–8");
+        }
+
+        int col = colLetter - 'a' + 1;
+        int row = rowNum - '0';
+
+        return new ChessPosition(row, col);
+    }
+
+    private ChessPiece.PieceType getPromotionPiece() {
+        while (true) {
+            System.out.println("What piece would you like to promote to?  ");
+            String line = new Scanner(System.in).nextLine().toLowerCase();
+            String[] cmds = line.split(" ");
+            String cmd = cmds[0];
+            switch (cmd) {
+                case "queen" -> {
+                    return ChessPiece.PieceType.QUEEN;
+                }
+                case "rook" -> {
+                    return ChessPiece.PieceType.ROOK;
+                }
+                case "bishop" -> {
+                    return ChessPiece.PieceType.BISHOP;
+                }
+                case "knight" -> {
+                    return ChessPiece.PieceType.KNIGHT;
+                }
+                default -> {
+                    System.out.println("Please enter a valid promotion piece type");
+                }
+            }
+        }
+    }
+
+    private boolean checkPromotion(ChessPosition start, ChessPosition end) {
+        if (currentGame.getBoard().getPiece(start).getPieceType() != ChessPiece.PieceType.PAWN) {
+            return false;
+        }
+        if (currentColor == ChessGame.TeamColor.WHITE && end.getRow() != 8) {
+            return false;
+        }
+        if (currentColor == ChessGame.TeamColor.BLACK && end.getRow() != 1) {
+            return false;
+        }
+        return true;
     }
 
     private String resign() {
