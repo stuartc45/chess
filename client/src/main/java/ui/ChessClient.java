@@ -98,8 +98,10 @@ public class ChessClient implements NotificationHandler {
     private void printPrompt() {
         if (state == States.SIGNEDOUT) {
             System.out.println("\n" + SET_TEXT_COLOR_BLUE + "[LOGGED OUT] >>> " + SET_TEXT_COLOR_GREEN);
-        } else {
+        } else if (state == States.SIGNEDIN) {
             System.out.println("\n" + SET_TEXT_COLOR_YELLOW + "[LOGGED IN] >>> " + SET_TEXT_COLOR_GREEN);
+        } else {
+            System.out.println("\n" + SET_TEXT_COLOR_RED + "[IN GAME] >>> " + SET_TEXT_COLOR_GREEN);
         }
     }
 

@@ -1,19 +1,23 @@
 package server.websocket;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
 import dataaccess.SqlDataAccess;
 import io.javalin.websocket.*;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.messages.Error;
 import websocket.messages.Notification;
 
 import java.io.IOException;
 
 public class WebSocketHandler {
     private final Connections connections = new Connections();
+    private final DataAccess db;
 
-    public WebSocketHandler() {
+    public WebSocketHandler(DataAccess db) {
+        this.db = db;
     }
 
     public void handleConnect(WsConnectContext ctx) {
@@ -54,7 +58,15 @@ public class WebSocketHandler {
     private void leave(String authToken, Integer gameID, WsMessageContext ctx) {
         try {
             connections.close(ctx);
-            String userName = new SqlDataAccess().getAuth(authToken).username();
+            String userName = db.getAuth(authToken).username();
+            var game = db.getGame(gameID);
+            if (game.whiteUsername().equalsIgnoreCase(userName)) {
+                db.updateGame(gameID, null, game.blackUsername(), game.gameName());
+            } else if (game.blackUsername().equalsIgnoreCase(userName)) {
+                db.updateGame(gameID, game.whiteUsername(), null, game.gameName());
+            } else {
+                connections.sendError(ctx, new Error("Error leaving the game"));
+            }
             connections.sendNotification(ctx, gameID, new Notification(userName + " has left the game"));
 
 

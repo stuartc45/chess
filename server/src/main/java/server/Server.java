@@ -25,7 +25,7 @@ public class Server {
             dataAccess = new MemoryDataAccess();
         }
 
-        WebSocketHandler webSocketHandler = new WebSocketHandler();
+        WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess);
 
 
 
