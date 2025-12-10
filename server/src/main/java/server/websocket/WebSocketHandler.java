@@ -71,7 +71,7 @@ public class WebSocketHandler {
             } else if (gameData.blackUsername().equals(userName)) {
                 connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game as black"));
             } else {
-                connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game"));
+                connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game as observer"));
             }
 
         } catch (DataAccessException | IOException ex) {

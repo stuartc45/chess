@@ -52,10 +52,12 @@ public class PrintChessBoard {
 
      public void printHighlightBoard(ChessGame game, ChessPosition position) {
          ChessBoard board = game.getBoard();
-         Collection<ChessMove> validMoves = game.validMoves(position);
          Set<ChessPosition> highlight = new HashSet<>();
-         for (var move : validMoves) {
-             highlight.add(move.getEndPosition());
+         if (board.getPiece(position) != null) {
+             Collection<ChessMove> validMoves = game.validMoves(position);
+             for (var move : validMoves) {
+                 highlight.add(move.getEndPosition());
+             }
          }
          highlight.add(position);
          boolean isWhite;
