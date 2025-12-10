@@ -7,9 +7,11 @@ import exception.ErrorResponse;
 import serverfacade.ServerFacade;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Arrays;
 import static ui.EscapeSequences.*;
@@ -34,17 +36,17 @@ public class ChessClient implements NotificationHandler {
     public void notify(ServerMessage message) {
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> {
-                var msg = (websocket.messages.Notification) message;
+                var msg = (NotificationMessage) message;
                 System.out.println(msg.getMessage());
                 printPrompt();
             }
             case ERROR -> {
-                var msg = (websocket.messages.Error) message;
+                var msg = (ErrorMessage) message;
                 System.out.println(msg.getMessage());
                 printPrompt();
             }
             case LOAD_GAME -> {
-                var msg = (websocket.messages.LoadGame) message;
+                var msg = (LoadGameMessage) message;
                 currentGame = msg.getGame();
                 System.out.println(RESET_TEXT_COLOR);
                 PrintChessBoard printer = new PrintChessBoard(currentColor);

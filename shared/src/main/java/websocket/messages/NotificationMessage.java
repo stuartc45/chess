@@ -2,11 +2,10 @@ package websocket.messages;
 
 import com.google.gson.Gson;
 
-public class Error extends ServerMessage {
+public class NotificationMessage extends ServerMessage {
     private final String message;
-
-    public Error(String message) {
-        super(ServerMessageType.ERROR);
+    public NotificationMessage(String message) {
+        super(ServerMessageType.NOTIFICATION);
         this.message = message;
     }
 

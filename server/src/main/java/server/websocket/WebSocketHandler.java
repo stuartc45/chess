@@ -6,22 +6,23 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccess;
 import dataaccess.DataAccessException;
-import dataaccess.SqlDataAccess;
 import datamodel.GameData;
 import io.javalin.websocket.*;
-import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.Error;
-import websocket.messages.LoadGame;
-import websocket.messages.Notification;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WebSocketHandler {
     private final Connections connections = new Connections();
     private final DataAccess db;
+//    private final Set<Integer> finished = ConcurrentHashMap.newKeySet();
 
     public WebSocketHandler(DataAccess db) {
         this.db = db;
@@ -49,7 +50,10 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+//            System.out.println(ex.getMessage());
+//            connections.sendError(ctx, new ErrorMessage("Error"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         }
     }
 
@@ -58,21 +62,21 @@ public class WebSocketHandler {
             connections.connect(gameID, ctx);
             var gameData = db.getGame(gameID);
             var game = gameData.game();
-            ServerMessage message = new LoadGame(game);
-            ctx.send(new Gson().toJson(message));
             String userName = db.getAuth(authToken).username();
+            ServerMessage message = new LoadGameMessage(game);
+            ctx.send(new Gson().toJson(message));
             if (gameData.whiteUsername().equals(userName)) {
-                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game as white"));
+                connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game as white"));
             } else if (gameData.blackUsername().equals(userName)) {
-                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game as black"));
+                connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game as black"));
             } else {
-                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game"));
+                connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has joined the game"));
             }
 
-        } catch (DataAccessException ex) {
-
-        } catch (IOException ex) {
-
+        } catch (DataAccessException | IOException ex) {
+//            connections.sendError(ctx, new ErrorMessage("Error"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         }
     }
 
@@ -86,13 +90,13 @@ public class WebSocketHandler {
             } else if (userName.equalsIgnoreCase(game.blackUsername())) {
                 db.updateGame(gameID, game.whiteUsername(), null, game.gameName());
             } else {
-                connections.sendError(ctx, new Error("Error leaving the game"));
+                connections.sendError(ctx, new ErrorMessage("Error leaving the game"));
             }
-            connections.sendNotification(ctx, gameID, new Notification(userName + " has left the game"));
-        } catch (DataAccessException ex) {
-
-        } catch (IOException ex) {
-
+            connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has left the game"));
+        } catch (DataAccessException | IOException ex) {
+//            connections.sendError(ctx, new ErrorMessage("Error"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         }
     }
 
@@ -100,9 +104,25 @@ public class WebSocketHandler {
         try {
             GameData gameData = db.getGame(gameID);
             ChessGame game = gameData.game();
+            String userName = db.getAuth(authToken).username();
+            if (!gameData.whiteUsername().equals(userName) && !gameData.blackUsername().equals(userName)) {
+                throw new IOException("Not allowed to make a move");
+            }
+            if (game.getTeamTurn() == ChessGame.TeamColor.WHITE) {
+                if (!gameData.whiteUsername().equals(userName)) {
+                    throw new IOException("Its not your turn");
+                }
+            } else if (game.getTeamTurn() == ChessGame.TeamColor.BLACK) {
+                if (!gameData.blackUsername().equals(userName)) {
+                    throw new IOException("Its not your turn");
+                }
+            }
+//            if (finished.contains(gameID)) {
+//                throw new IOException("Game is over");
+//            }
             game.makeMove(chessMove);
             db.updateGameState(gameID, game);
-            connections.sendGame(ctx, gameID, new LoadGame(game));
+            connections.sendGame(ctx, gameID, new LoadGameMessage(game));
             String start = toChessNotation(
                     chessMove.getStartPosition().getRow(),
                     chessMove.getStartPosition().getColumn()
@@ -111,24 +131,27 @@ public class WebSocketHandler {
                     chessMove.getEndPosition().getRow(),
                     chessMove.getEndPosition().getColumn()
             );
-            String userName = db.getAuth(authToken).username();
             String msg = userName + " moved from " + start + " to " + end;
-            connections.sendNotification(ctx, gameID, new Notification(msg));
+            connections.sendNotification(ctx, gameID, new NotificationMessage(msg));
 
-            if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotificationAll(gameID, new Notification("White is in check"));
-            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotificationAll(gameID, new Notification("Black is in check"));
-            }
+
             if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotificationAll(gameID, new Notification("White is in checkmate"));
+                connections.sendNotificationAll(gameID, new NotificationMessage("White is in checkmate"));
             } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotificationAll(gameID, new Notification("Black is in checkmate"));
+                connections.sendNotificationAll(gameID, new NotificationMessage("Black is in checkmate"));
+            } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                connections.sendNotificationAll(gameID, new NotificationMessage("White is in check"));
+            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                connections.sendNotificationAll(gameID, new NotificationMessage("Black is in check"));
             }
         } catch (DataAccessException | IOException ex) {
-            System.out.println("failed to make the move");
+//            connections.sendError(ctx, new ErrorMessage("Error"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         } catch (InvalidMoveException ex) {
-            connections.sendError(ctx, new Error("Error: Move not valid"));
+//            connections.sendError(ctx, new ErrorMessage("Error: Move not valid"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         }
     }
 
@@ -136,13 +159,21 @@ public class WebSocketHandler {
         try {
             GameData gameData = db.getGame(gameID);
             ChessGame game = gameData.game();
+            String userName = db.getAuth(authToken).username();
+            if (!gameData.whiteUsername().equals(userName) && !gameData.blackUsername().equals(userName)) {
+                throw new Exception("Not allowed to resign");
+            }
+            if (game.getTeamTurn() == null) {
+                throw new Exception("Game is over");
+            }
             game.setTeamTurn(null);
             db.updateGameState(gameID, game);
-            String userName = db.getAuth(authToken).username();
             String msg = userName + " has resigned from the game";
-            connections.sendNotificationAll(gameID, new Notification(msg));
-        } catch (DataAccessException ex) {
-
+            connections.sendNotificationAll(gameID, new NotificationMessage(msg));
+        } catch (Exception ex) {
+//            connections.sendError(ctx, new ErrorMessage("Error"));
+            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
+            ctx.send(new Gson().toJson(error));
         }
     }
 

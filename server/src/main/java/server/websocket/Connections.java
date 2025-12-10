@@ -1,11 +1,9 @@
 package server.websocket;
 
 import io.javalin.websocket.*;
-import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.Error;
-import websocket.messages.LoadGame;
-import websocket.messages.Notification;
-import websocket.messages.ServerMessage;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,7 +19,7 @@ public class Connections {
         connections.remove(ctx);
     }
 
-    public void sendNotification(WsMessageContext ctx, Integer gameID, Notification message) throws IOException {
+    public void sendNotification(WsMessageContext ctx, Integer gameID, NotificationMessage message) throws IOException {
         String msg = message.getJson();
         for (var c : connections.entrySet()) {
             if (c.getValue().equals(gameID)) {
@@ -34,7 +32,7 @@ public class Connections {
         }
     }
 
-    public void sendNotificationAll(Integer gameID, Notification message) {
+    public void sendNotificationAll(Integer gameID, NotificationMessage message) {
         String msg = message.getJson();
         for (var c : connections.entrySet()) {
             if (c.getValue().equals(gameID)) {
@@ -45,14 +43,15 @@ public class Connections {
         }
     }
 
-    public void sendError(WsMessageContext ctx, Error message) {
+    public void sendError(WsMessageContext ctx, ErrorMessage message) {
         String msg = message.getJson();
+        System.out.println(msg);
         if (connections.containsKey(ctx) && ctx.session.isOpen()) {
             ctx.send(msg);
         }
     }
 
-    public void sendGame(WsMessageContext ctx, Integer gameID, LoadGame message) {
+    public void sendGame(WsMessageContext ctx, Integer gameID, LoadGameMessage message) {
         String msg = message.getJson();
         for (var c : connections.entrySet()) {
             if (c.getValue().equals(gameID)) {

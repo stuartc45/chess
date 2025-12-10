@@ -3,10 +3,10 @@ package websocket.messages;
 import chess.ChessGame;
 import com.google.gson.Gson;
 
-public class LoadGame extends ServerMessage {
+public class LoadGameMessage extends ServerMessage {
     private final ChessGame game;
 
-    public LoadGame(ChessGame game) {
+    public LoadGameMessage(ChessGame game) {
         super(ServerMessageType.LOAD_GAME);
         this.game = game;
     }
