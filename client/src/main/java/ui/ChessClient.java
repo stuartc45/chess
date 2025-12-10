@@ -21,15 +21,12 @@ public class ChessClient implements NotificationHandler {
     private States state = States.SIGNEDOUT;
     private String authToken;
     private final WebSocketFacade ws;
-//    private HashMap<Integer, Integer> gameMap;
-//    private Integer clientGameId = 1;
     private ChessGame currentGame = null;
     private Integer currentGameID = null;
     private ChessGame.TeamColor currentColor;
 
     public ChessClient(String serverUrl) throws Exception {
         this.serverFacade = new ServerFacade(serverUrl);
-//        gameMap = new HashMap<>();
         ws = new WebSocketFacade(serverUrl, this);
     }
 
@@ -92,7 +89,7 @@ public class ChessClient implements NotificationHandler {
                 case "join" -> joinGame(params);
                 case "observe" -> observeGame(params);
                 case "clear" -> clearDb();
-                case "showmoves" -> highlightMoves(params);
+                case "highlight" -> highlightMoves(params);
                 case "redraw" -> redrawBoard();
                 case "move" -> makeChessMove(params);
                 case "leave" -> leaveGame();
@@ -121,7 +118,7 @@ public class ChessClient implements NotificationHandler {
                     leave - leaves the game
                     resign - forfeit and end the game
                     move <POSITION> <POSITION> - make a chess move
-                    showmoves <POSITION> - shows the legal moves for a piece
+                    highlight <POSITION> - shows the legal moves for a piece
                     help - print possible commands""";
         } else if (state == States.SIGNEDIN) {
             return """
@@ -269,6 +266,7 @@ public class ChessClient implements NotificationHandler {
         }
         try {
             Integer gameID = Integer.valueOf(params[0]);
+            currentColor = ChessGame.TeamColor.WHITE;
             ws.joinGame(authToken, gameID);
             currentGameID = gameID;
             state = States.OBSERVE;

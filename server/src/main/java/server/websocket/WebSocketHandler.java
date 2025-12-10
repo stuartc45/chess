@@ -141,7 +141,7 @@ public class WebSocketHandler {
                 connections.sendNotificationAll(gameID, new NotificationMessage(gameData.blackUsername() + " is in check"));
             }
         } catch (DataAccessException | IOException ex) {
-            connections.sendError(ctx, new ErrorMessage("Error"));
+            connections.sendError(ctx, new ErrorMessage("Error: " + ex.getMessage()));
         } catch (InvalidMoveException ex) {
             connections.sendError(ctx, new ErrorMessage("Error: Move not valid"));
         }
@@ -167,7 +167,7 @@ public class WebSocketHandler {
             String msg = userName + " has resigned from the game";
             connections.sendNotificationAll(gameID, new NotificationMessage(msg));
         } catch (Exception ex) {
-            connections.sendError(ctx, new ErrorMessage("Error"));
+            connections.sendError(ctx, new ErrorMessage("Error: " + ex.getMessage()));
         }
     }
 
