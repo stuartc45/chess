@@ -22,10 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler {
     private final Connections connections = new Connections();
     private final DataAccess db;
-//    private final Set<Integer> finished = ConcurrentHashMap.newKeySet();
+    private final Set<Integer> finished = ConcurrentHashMap.newKeySet();
 
     public WebSocketHandler(DataAccess db) {
         this.db = db;
+    }
+
+    public void clear() {
+        finished.clear();
     }
 
     public void handleConnect(WsConnectContext ctx) {
@@ -117,9 +121,9 @@ public class WebSocketHandler {
                     throw new IOException("Its not your turn");
                 }
             }
-//            if (finished.contains(gameID)) {
-//                throw new IOException("Game is over");
-//            }
+            if (finished.contains(gameID)) {
+                throw new IOException("Game is over");
+            }
             game.makeMove(chessMove);
             db.updateGameState(gameID, game);
             connections.sendGame(ctx, gameID, new LoadGameMessage(game));
@@ -134,15 +138,14 @@ public class WebSocketHandler {
             String msg = userName + " moved from " + start + " to " + end;
             connections.sendNotification(ctx, gameID, new NotificationMessage(msg));
 
-
             if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotificationAll(gameID, new NotificationMessage("White is in checkmate"));
+                connections.sendNotificationAll(gameID, new NotificationMessage(gameData.whiteUsername() + " is in checkmate"));
             } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotificationAll(gameID, new NotificationMessage("Black is in checkmate"));
+                connections.sendNotificationAll(gameID, new NotificationMessage(gameData.blackUsername() + " is in checkmate"));
             } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotificationAll(gameID, new NotificationMessage("White is in check"));
+                connections.sendNotificationAll(gameID, new NotificationMessage(gameData.whiteUsername() + " is in check"));
             } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotificationAll(gameID, new NotificationMessage("Black is in check"));
+                connections.sendNotificationAll(gameID, new NotificationMessage(gameData.blackUsername() + " is in check"));
             }
         } catch (DataAccessException | IOException ex) {
 //            connections.sendError(ctx, new ErrorMessage("Error"));
@@ -166,8 +169,12 @@ public class WebSocketHandler {
             if (game.getTeamTurn() == null) {
                 throw new Exception("Game is over");
             }
+            if (finished.contains(gameID)) {
+                throw new Exception("Game is over");
+            }
             game.setTeamTurn(null);
             db.updateGameState(gameID, game);
+            finished.add(gameID);
             String msg = userName + " has resigned from the game";
             connections.sendNotificationAll(gameID, new NotificationMessage(msg));
         } catch (Exception ex) {

@@ -17,6 +17,7 @@ public class Server {
     private final UserService userService;
     private final GameService gameService;
     private DataAccess dataAccess;
+    WebSocketHandler webSocketHandler;
 
     public Server() {
         try {
@@ -25,7 +26,7 @@ public class Server {
             dataAccess = new MemoryDataAccess();
         }
 
-        WebSocketHandler webSocketHandler = new WebSocketHandler(dataAccess);
+        webSocketHandler = new WebSocketHandler(dataAccess);
 
 
 
@@ -51,6 +52,7 @@ public class Server {
     private void clear(Context context) throws DataAccessException {
         try {
             userService.clear();
+            webSocketHandler.clear();
             context.result("{}");
         } catch (Exception e) {
             var message = String.format("{\"message\": \"Internal Server Error: %s\"}", e.getMessage());
