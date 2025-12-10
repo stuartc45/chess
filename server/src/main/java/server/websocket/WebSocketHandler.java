@@ -54,10 +54,7 @@ public class WebSocketHandler {
                 }
             }
         } catch (Exception ex) {
-//            System.out.println(ex.getMessage());
-//            connections.sendError(ctx, new ErrorMessage("Error"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error"));
         }
     }
 
@@ -78,9 +75,7 @@ public class WebSocketHandler {
             }
 
         } catch (DataAccessException | IOException ex) {
-//            connections.sendError(ctx, new ErrorMessage("Error"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error"));
         }
     }
 
@@ -98,9 +93,7 @@ public class WebSocketHandler {
             }
             connections.sendNotification(ctx, gameID, new NotificationMessage(userName + " has left the game"));
         } catch (DataAccessException | IOException ex) {
-//            connections.sendError(ctx, new ErrorMessage("Error"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error"));
         }
     }
 
@@ -148,13 +141,9 @@ public class WebSocketHandler {
                 connections.sendNotificationAll(gameID, new NotificationMessage(gameData.blackUsername() + " is in check"));
             }
         } catch (DataAccessException | IOException ex) {
-//            connections.sendError(ctx, new ErrorMessage("Error"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error"));
         } catch (InvalidMoveException ex) {
-//            connections.sendError(ctx, new ErrorMessage("Error: Move not valid"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error: Move not valid"));
         }
     }
 
@@ -178,9 +167,7 @@ public class WebSocketHandler {
             String msg = userName + " has resigned from the game";
             connections.sendNotificationAll(gameID, new NotificationMessage(msg));
         } catch (Exception ex) {
-//            connections.sendError(ctx, new ErrorMessage("Error"));
-            ServerMessage error = new ErrorMessage("Error: " + ex.getMessage());
-            ctx.send(new Gson().toJson(error));
+            connections.sendError(ctx, new ErrorMessage("Error"));
         }
     }
 
