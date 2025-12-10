@@ -4,6 +4,7 @@ import io.javalin.websocket.*;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,11 +53,11 @@ public class Connections {
     }
 
     public void sendGame(WsMessageContext ctx, Integer gameID, LoadGameMessage message) {
-        String msg = message.getJson();
-        for (var c : connections.entrySet()) {
-            if (c.getValue().equals(gameID)) {
-                if (c.getKey().session.isOpen()) {
-                    c.getKey().send(msg);
+        String newMessage = message.getJson();
+        for (var session : connections.entrySet()) {
+            if (session.getValue().equals(gameID)) {
+                if (session.getKey().session.isOpen()) {
+                    session.getKey().send(newMessage);
                 }
             }
         }
