@@ -337,17 +337,17 @@ public class ChessClient implements NotificationHandler {
             throw new Exception("Incorrect position. Expected positions examples: a2, h7, etc.");
         }
 
-        char colLetter = Character.toLowerCase(square.charAt(0));
-        char rowNum = square.charAt(1);
-        if (colLetter < 'a' || colLetter > 'h') {
+        char c = Character.toLowerCase(square.charAt(0));
+        char r = square.charAt(1);
+        if (c < 'a' || c > 'h') {
             throw new Exception("Column must be a–h");
         }
-        if (rowNum < '1' || rowNum > '8') {
+        if (r < '1' || r > '8') {
             throw new Exception("Row must be 1–8");
         }
 
-        int col = colLetter - 'a' + 1;
-        int row = rowNum - '0';
+        int col = c - 'a' + 1;
+        int row = r - '0';
 
         return new ChessPosition(row, col);
     }
@@ -391,8 +391,15 @@ public class ChessClient implements NotificationHandler {
         return true;
     }
 
-    private String resign() {
-        return null;
+    private String resign() throws Exception {
+        assertInGame();
+        System.out.println("Are you sure you want to resign? (y/n) ");
+        String line = new Scanner(System.in).nextLine().toLowerCase();
+        if (!line.equals("y")) {
+            return "Resign cancelled";
+        }
+        ws.resignGame(authToken, currentGameID);
+        return "";
     }
 
     private String clearDb() throws Exception {

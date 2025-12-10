@@ -56,11 +56,19 @@ public class WebSocketHandler {
     private void join(String authToken, Integer gameID, WsMessageContext ctx) {
         try {
             connections.connect(gameID, ctx);
-            var game = db.getGame(gameID).game();
+            var gameData = db.getGame(gameID);
+            var game = gameData.game();
             ServerMessage message = new LoadGame(game);
             ctx.send(new Gson().toJson(message));
             String userName = db.getAuth(authToken).username();
-            connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game"));
+            if (gameData.whiteUsername().equals(userName)) {
+                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game as white"));
+            } else if (gameData.blackUsername().equals(userName)) {
+                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game as black"));
+            } else {
+                connections.sendNotification(ctx, gameID, new Notification(userName + " has joined the game"));
+            }
+
         } catch (DataAccessException ex) {
 
         } catch (IOException ex) {
@@ -108,16 +116,16 @@ public class WebSocketHandler {
             connections.sendNotification(ctx, gameID, new Notification(msg));
 
             if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotification(null, gameID, new Notification("White is in check"));
+                connections.sendNotificationAll(gameID, new Notification("White is in check"));
             }
             if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotification(null, gameID, new Notification("Black is in check"));
+                connections.sendNotificationAll(gameID, new Notification("Black is in check"));
             }
             if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                connections.sendNotification(null, gameID, new Notification("White is in checkmate"));
+                connections.sendNotificationAll(gameID, new Notification("White is in checkmate"));
             }
             if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                connections.sendNotification(null, gameID, new Notification("Black is in checkmate"));
+                connections.sendNotificationAll(gameID, new Notification("Black is in checkmate"));
             }
         } catch (DataAccessException | IOException ex) {
             System.out.println("failed to make the move");
@@ -127,7 +135,17 @@ public class WebSocketHandler {
     }
 
     private void resign(String authToken, Integer gameID, WsMessageContext ctx) {
+        try {
+            GameData gameData = db.getGame(gameID);
+            ChessGame game = gameData.game();
+            game.setTeamTurn(null);
+            db.updateGameState(gameID, game);
+            String userName = db.getAuth(authToken).username();
+            String msg = userName + " has resigned from the game";
+            connections.sendNotificationAll(gameID, new Notification(msg));
+        } catch (DataAccessException ex) {
 
+        }
     }
 
     private String toChessNotation(int row, int col) {

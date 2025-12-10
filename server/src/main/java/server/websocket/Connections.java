@@ -34,6 +34,17 @@ public class Connections {
         }
     }
 
+    public void sendNotificationAll(Integer gameID, Notification message) {
+        String msg = message.getJson();
+        for (var c : connections.entrySet()) {
+            if (c.getValue().equals(gameID)) {
+                if (c.getKey().session.isOpen()) {
+                    c.getKey().send(msg);
+                }
+            }
+        }
+    }
+
     public void sendError(WsMessageContext ctx, Error message) {
         String msg = message.getJson();
         if (connections.containsKey(ctx) && ctx.session.isOpen()) {
