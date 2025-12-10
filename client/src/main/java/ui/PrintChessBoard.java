@@ -76,8 +76,10 @@ public class PrintChessBoard {
 
                  boolean highlighted = highlight.contains(square);
 
-                 if (highlighted) {
-                     boardString.append(SET_BG_COLOR_BLUE);
+                 if (highlighted && (i + j) % 2 == 0) {
+                     boardString.append(SET_BG_COLOR_GREEN);
+                 } else if (highlighted) {
+                     boardString.append(SET_BG_COLOR_DARK_GREEN);
                  } else if ((i + j) % 2 == 0) {
                      boardString.append(SET_BG_COLOR_LIGHT_GREY);
                  } else {
