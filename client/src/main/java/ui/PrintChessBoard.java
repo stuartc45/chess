@@ -53,11 +53,11 @@ public class PrintChessBoard {
      public void printHighlightBoard(ChessGame game, ChessPosition position) {
          ChessBoard board = game.getBoard();
          Collection<ChessMove> validMoves = game.validMoves(position);
-         Set<ChessPosition> highlightSquares = new HashSet<>();
+         Set<ChessPosition> highlight = new HashSet<>();
          for (var move : validMoves) {
-             highlightSquares.add(move.getEndPosition());
+             highlight.add(move.getEndPosition());
          }
-         highlightSquares.add(position);
+         highlight.add(position);
          boolean isWhite;
          isWhite = color == ChessGame.TeamColor.WHITE;
          var boardString = new StringBuilder();
@@ -74,9 +74,9 @@ public class PrintChessBoard {
                  int colNum = isWhite ? j + 1 : 8 - j;
                  ChessPosition square = new ChessPosition(rowNum, colNum);
 
-                 boolean highlight = highlightSquares.contains(square);
+                 boolean highlighted = highlight.contains(square);
 
-                 if (highlight) {
+                 if (highlighted) {
                      boardString.append(SET_BG_COLOR_BLUE);
                  } else if ((i + j) % 2 == 0) {
                      boardString.append(SET_BG_COLOR_LIGHT_GREY);
