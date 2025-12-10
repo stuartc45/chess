@@ -117,14 +117,12 @@ public class WebSocketHandler {
 
             if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
                 connections.sendNotificationAll(gameID, new Notification("White is in check"));
-            }
-            if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
                 connections.sendNotificationAll(gameID, new Notification("Black is in check"));
             }
             if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
                 connections.sendNotificationAll(gameID, new Notification("White is in checkmate"));
-            }
-            if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
                 connections.sendNotificationAll(gameID, new Notification("Black is in checkmate"));
             }
         } catch (DataAccessException | IOException ex) {

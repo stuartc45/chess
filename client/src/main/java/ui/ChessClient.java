@@ -266,15 +266,10 @@ public class ChessClient implements NotificationHandler {
             return "Please only include the ID of the game you wish to observe";
         }
         try {
-            Integer listID = Integer.valueOf(params[0]);
-//            if (!gameMap.containsKey(listID)) {
-//                throw new Exception("Enter a valid game ID");
-//            }
-            // you're going to need something that checks for this ^^^
-            ChessBoard board = new ChessBoard();
-            board.resetBoard();
-//            PrintChessBoard printChessBoard = new PrintChessBoard("white");
-//            printChessBoard.printBoard(board);
+            Integer gameID = Integer.valueOf(params[0]);
+            ws.joinGame(authToken, gameID);
+            currentGameID = gameID;
+            state = States.OBSERVE;
             return String.format("Observing game %s", params[0]);
         } catch (NumberFormatException e) {
             throw new Exception("Please enter a numerical value");
@@ -309,6 +304,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     private String makeChessMove(String[] params) throws Exception {
+        assertPlayer();
         if (params.length > 2) {
             throw new Exception("Only include the start and end positions of the piece you want to move");
         }
@@ -392,7 +388,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     private String resign() throws Exception {
-        assertInGame();
+        assertPlayer();
         System.out.println("Are you sure you want to resign? (y/n) ");
         String line = new Scanner(System.in).nextLine().toLowerCase();
         if (!line.equals("y")) {
@@ -407,8 +403,6 @@ public class ChessClient implements NotificationHandler {
         try {
             serverFacade.clearDb();
             state = States.SIGNEDOUT;
-//            gameMap.clear();
-//            clientGameId = 1;
             return "Database cleared";
         } catch (Exception ex) {
             String errMessage = getErrorMessage(ex);
@@ -424,10 +418,20 @@ public class ChessClient implements NotificationHandler {
         }
     }
 
+    private void assertPlayer() throws Exception {
+        if (state == States.SIGNEDIN) {
+            throw new Exception("You must join a game first");
+        } else if (state == States.SIGNEDOUT) {
+            throw new Exception("You must sign in");
+        } else if (state == States.OBSERVE) {
+            throw new Exception("You are observing");
+        }
+    }
+
     private void assertSignedIn() throws Exception {
         if (state == States.SIGNEDOUT) {
             throw new Exception("You must sign in");
-        } else if (state == States.GAMEPLAY) {
+        } else if (state == States.GAMEPLAY || state == States.OBSERVE) {
             throw new Exception("You must leave the game first");
         }
     }
@@ -435,7 +439,7 @@ public class ChessClient implements NotificationHandler {
     private void assertSignedOut() throws Exception {
         if (state == States.SIGNEDIN) {
             throw new Exception("You're already signed in");
-        } else if (state == States.GAMEPLAY) {
+        } else if (state == States.GAMEPLAY || state == States.OBSERVE) {
             throw new Exception("You're already signed in");
         }
     }
